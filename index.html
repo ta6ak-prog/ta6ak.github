@@ -179,7 +179,7 @@ a { color:inherit; text-decoration:none; }
     <div class="nav-links">
       <a href="#catalog">Каталог</a>
       <a href="#features">Почему мы</a>
-      <a href="#reviews">Отзывы</a>
+      <a href="#reviews">Отзывы</a> 
     </div>
     <div style="display:flex;gap:10px;align-items:center;">
       <button class="icon-button" id="theme-toggle" style="border:none;font-size:20px;background:transparent;" title="Тема">🌙</button>
@@ -237,7 +237,7 @@ a { color:inherit; text-decoration:none; }
 
 <footer class="footer">
   <div class="container">
-    <p><strong>ТУМАН</strong> · Минск</p>
+    <p><strong>ТУМАН</strong> · Минск</p> 
     <p>Связь: <a href="https://t.me/nekati_n" target="_blank">@nekati_n</a></p>
   </div>
 </footer>
@@ -503,11 +503,11 @@ const DEFAULT_PRODUCTS = [
   { id:93, name:"Испаритель Smoant - 0.3 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" }
 ];
 
-const DEFAULT_REVIEWS = [
-  { id:1, name:"Алексей", avatar:"А", text:"Заказал на пробу пару вкусов. Доставили на следующий день к метро.", stars:5 },
-  { id:2, name:"Марина", avatar:"М", text:"Очень удобный сайт. Заказала Xros mini, быстро договорились.", stars:5 },
+const DEFAULT_REVIEWS = [ //
+  { id:1, name:"Алексей", avatar:"А", text:"Заказал на пробу пару вкусов. Доставили на следующий день к метро.", stars:5 }, //
+  { id:2, name:"Марина", avatar:"М", text:"Очень удобный сайт. Заказала Xros mini, быстро договорились.", stars:5 }, //
   { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный.", stars:4 }
-];
+]; //
 
 let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
 let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
