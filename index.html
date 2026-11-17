@@ -886,7 +886,7 @@ async function submitOrder() {
     });
   } catch (e) { console.log('Sheets post error', e); }
 
-  let adminText = `🚀 *Новая заявка!*\n\n👤 Клиент: ${order.name}\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Заказ:*\n`;
+  let adminText = `🔞 *Новый Заказик!🔞*\n\n👤 Клиент: ${order.name}\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Заказ:*\n`;
   order.items.forEach(i => { adminText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
   if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
   adminText += `\n💰 *Итого: ${order.total} руб.*`;
