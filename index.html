@@ -503,11 +503,8 @@ const DEFAULT_PRODUCTS = [
   { id:93, name:"Испаритель Smoant - 0.3 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" }
 ];
 
-const DEFAULT_REVIEWS = [ //
-  { id:1, name:"Алексей", avatar:"А", text:"Заказал на пробу пару вкусов. Доставили на следующий день к метро.", stars:5 }, //
-  { id:2, name:"Марина", avatar:"М", text:"Очень удобный сайт. Заказала Xros mini, быстро договорились.", stars:5 }, //
-  { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный.", stars:4 }
-]; //
+
+]; 
 
 let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
 let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
