@@ -64,7 +64,6 @@ a { color:inherit; text-decoration:none; }
 .footer { padding:20px 0; text-align:center; color:var(--muted); border-top:1px solid var(--border); }
 .footer a { color:var(--purple-light); }
 
-/* Backdrop & Cart */
 .backdrop { position:fixed; inset:0; z-index:19; visibility:hidden; background:rgba(0,0,0,.7); opacity:0; transition:.25s; }
 .backdrop.open { visibility:visible; opacity:1; }
 .cart-panel { position:fixed; top:0; right:0; z-index:20; width:min(430px,100%); height:100dvh; display:flex; flex-direction:column; padding:23px; background:var(--panel); border-left:1px solid var(--border); transform:translateX(105%); transition:transform .28s; }
@@ -84,7 +83,6 @@ a { color:inherit; text-decoration:none; }
 .cart-item-price { font-size:12px; color:var(--muted); }
 .cart-item-total { font-weight:bold; color:var(--purple-light); white-space:nowrap; }
 
-/* Checkout modal */
 .checkout-modal { position:fixed; inset:0; z-index:110; display:none; background:rgba(0,0,0,.85); padding:20px; overflow-y:auto; align-items:center; justify-content:center; }
 .checkout-modal.open { display:flex; }
 .checkout-content { width:100%; max-width:550px; padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
@@ -97,7 +95,6 @@ a { color:inherit; text-decoration:none; }
 .discount-row { display:none; justify-content:space-between; color:#4ade80; font-size:14px; margin-bottom:5px; }
 .total-row { display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin:20px 0; padding-top:15px; border-top:1px solid var(--border); }
 
-/* Клиентские заявки */
 .my-orders-modal { position:fixed; inset:0; z-index:105; display:none; background:rgba(0,0,0,.85); padding:20px; overflow-y:auto; align-items:center; justify-content:center; }
 .my-orders-modal.open { display:flex; }
 .my-orders-content { width:100%; max-width:600px; padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
@@ -108,13 +105,11 @@ a { color:inherit; text-decoration:none; }
 .admin-msg.reject { background:rgba(255,77,77,0.1); color:#ff4d4d; border:1px solid rgba(255,77,77,0.3); }
 .admin-msg.approve { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
 
-/* Age gate */
 .age-gate { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(8,4,14,.98); }
 .age-gate.hidden { display:none; }
 .age-card { width:min(440px,100%); padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:24px; text-align:center; }
 .age-actions { display:flex; justify-content:center; gap:10px; margin-top:20px; }
 
-/* Admin */
 .admin-modal { position:fixed; inset:0; z-index:100; display:none; background:rgba(0,0,0,.9); padding:20px; overflow-y:auto; }
 .admin-modal.open { display:block; }
 .admin-content { max-width:1100px; margin:20px auto; padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
@@ -142,7 +137,6 @@ a { color:inherit; text-decoration:none; }
 .admin-msg-input { width:100%; padding:10px; margin-top:10px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:8px; resize:vertical; font-size:13px; }
 .btn-save-msg { background:var(--purple); color:#000; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:12px; margin-top:5px; cursor:pointer; }
 
-/* Toast */
 .toast-container { position:fixed; bottom:20px; right:20px; z-index:1000; display:flex; flex-direction:column; gap:10px; }
 .toast { padding:15px 20px; background:var(--panel); border:1px solid var(--purple); border-radius:10px; font-weight:bold; animation:slideIn .3s; }
 @keyframes slideIn { from{transform:translateX(100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
@@ -245,7 +239,6 @@ a { color:inherit; text-decoration:none; }
 
 <div class="backdrop" id="backdrop"></div>
 
-<!-- КОРЗИНА -->
 <aside class="cart-panel" id="cart-panel">
   <div class="cart-header">
     <h2>Корзина</h2>
@@ -263,7 +256,6 @@ a { color:inherit; text-decoration:none; }
   </div>
 </aside>
 
-<!-- ОФОРМЛЕНИЕ -->
 <div class="checkout-modal" id="checkout-modal">
   <div class="checkout-content">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -296,7 +288,6 @@ a { color:inherit; text-decoration:none; }
   </div>
 </div>
 
-<!-- МОИ ЗАЯВКИ КЛИЕНТА -->
 <div class="my-orders-modal" id="my-orders-modal">
   <div class="my-orders-content">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -308,7 +299,6 @@ a { color:inherit; text-decoration:none; }
   </div>
 </div>
 
-<!-- АДМИНКА -->
 <div class="admin-modal" id="admin-modal">
   <div class="admin-content">
     <div class="admin-header">
@@ -348,11 +338,11 @@ a { color:inherit; text-decoration:none; }
       <h3 style="margin-bottom:15px;">Настройки Telegram-бота</h3>
       <div class="form-group">
         <label>Токен бота:</label>
-        <input type="text" id="set-tg-token" placeholder="8908220363:AAEvJXcmrOOU-aMNMiinww5ajexCcdAW2dU" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
+        <input type="text" id="set-tg-token" value="8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
       </div>
       <div class="form-group">
-        <label>ID чата (узнать у @userinfobot):</label>
-        <input type="text" id="set-tg-chat" placeholder="123456789" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
+        <label>ID чата:</label>
+        <input type="text" id="set-tg-chat" value="5512515146" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
       </div>
       <button class="button" id="save-tg-settings" style="margin-bottom:30px;">Сохранить настройки</button>
       
@@ -375,7 +365,6 @@ a { color:inherit; text-decoration:none; }
 <script>
 "use strict";
 
-// ============ КОНСТАНТЫ ============
 const KEY_PRODUCTS = 'tuman_products_v5';
 const KEY_CART = 'tuman_cart_v5';
 const KEY_ORDERS = 'tuman_orders_v5';
@@ -389,9 +378,7 @@ const KEY_TG_TOKEN = 'tuman_tg_token';
 const KEY_TG_CHAT = 'tuman_tg_chat';
 const ADMIN_PASSWORD = 'Skitolss';
 
-// ============ ДЕФОЛТНЫЕ ДАННЫЕ (ТВОЙ СПИСОК) ============
 const DEFAULT_PRODUCTS = [
-  // Жидкости
   { id:1, name:"Annima Love 50mg — Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", inStock:true },
   { id:2, name:"Annima Love 50mg — Черника гранат", price:15, desc:"🫐❤️", category:"liquid", categoryName:"Жидкость", icon:"❤️", inStock:true },
   { id:3, name:"BJORN ZLOY 60mg — Энергетик Виноград", price:15, desc:"⚡️🍇", category:"liquid", categoryName:"Жидкость", icon:"🐻", inStock:true },
@@ -464,17 +451,11 @@ const DEFAULT_PRODUCTS = [
   { id:70, name:"Пошлая Рабыня 83mg — Кока Кола с Ванилью", price:15, desc:"🥤🍦", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true },
   { id:71, name:"Пошлая Рабыня 83mg — Passionfruit Манго Маракуйя", price:15, desc:"🥭", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true },
   { id:72, name:"Пошлая Рабыня 83mg — Цитрусовый Микс", price:15, desc:"🍋🍊", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true },
-
-  // Снюс
   { id:73, name:"Iceburn Ghetto 150mg — Малина Вишня", price:12, desc:"🍓🍒", category:"snus", categoryName:"Снюс", icon:"🔥", inStock:true },
   { id:74, name:"Iceburn Ghetto 150mg — Персик Малина", price:12, desc:"🍑🍓", category:"snus", categoryName:"Снюс", icon:"🔥", inStock:true },
   { id:75, name:"Iceburn Ghetto 150mg — Энергетик Вишня", price:12, desc:"⚡️🍒", category:"snus", categoryName:"Снюс", icon:"🔥", inStock:true },
   { id:76, name:"Iceburn Monster 75mg — Цитрус", price:12, desc:"🍋🍊", category:"snus", categoryName:"Снюс", icon:"👹", inStock:true },
-
-  // Никобустеры
   { id:77, name:"Никобустер 2%", price:4, desc:"💧", category:"accessory", categoryName:"Никобустер", icon:"🧪", inStock:true },
-
-  // Под-системы
   { id:78, name:"Xros 6 mini — Black (3 шт)", price:60, desc:"🖤", category:"device", categoryName:"Под-система", icon:"📱", inStock:true },
   { id:79, name:"Xros 6 mini — Titanium black (3 шт)", price:60, desc:"🩶", category:"device", categoryName:"Под-система", icon:"📱", inStock:true },
   { id:80, name:"Xros 6 mini — Titanium silver (3 шт)", price:60, desc:"🤍", category:"device", categoryName:"Под-система", icon:"📱", inStock:true },
@@ -486,8 +467,6 @@ const DEFAULT_PRODUCTS = [
   { id:86, name:"Hero 5 — Steel silver", price:95, desc:"⚙️", category:"device", categoryName:"Под-система", icon:"🛡️", inStock:true },
   { id:87, name:"Hero 5 — Pure white", price:95, desc:"🤍", category:"device", categoryName:"Под-система", icon:"🛡️", inStock:true },
   { id:88, name:"BRUSKO FEELIN — Черный", price:20, desc:"🖤", category:"device", categoryName:"Под-система", icon:"⚡", inStock:true },
-
-  // Расходники
   { id:89, name:"Картридж xros 0.4 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true },
   { id:90, name:"Картридж xros 0.6 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true },
   { id:91, name:"Картридж xros 0.8 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true },
@@ -501,21 +480,11 @@ const DEFAULT_REVIEWS = [
   { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный, всегда в наличии.", stars:4 }
 ];
 
-// ОТСОРТИРОВАННЫЕ ВЕТКИ МЕТРО (КРАСНАЯ И СИНЯЯ)
 const METRO = {
-  red: [
-    "Малиновка", "Петровщина", "Михалово", "Грушевка", "Площадь Франтишка Богушевича", 
-    "Институт Культуры", "Площадь Ленина", "Октябрьская", "Площадь Победы", "Парк Челюскинцев", 
-    "Академия Наук", "Площадь Якуба Коласа", "Восток", "Борисовский тракт", "Уручье"
-  ],
-  blue: [
-    "Каменная Горка", "Кунцевщина", "Спортивная", "Молодежная", "Фрунзенская", "Немига", 
-    "Купаловская", "Октябрьская", "Площадь Ленина", "Первомайская", "Пролетарская", 
-    "Тракторный завод", "Партизанская", "Автозаводская", "Могилевская", "Шабаны"
-  ]
+  red: ["Малиновка","Петровщина","Михалово","Грушевка","Площадь Франтишка Богушевича","Институт Культуры","Площадь Ленина","Октябрьская","Площадь Победы","Парк Челюскинцев","Академия Наук","Площадь Якуба Коласа","Восток","Борисовский тракт","Уручье"],
+  blue: ["Каменная Горка","Кунцевщина","Спортивная","Молодежная","Фрунзенская","Немига","Купаловская","Октябрьская","Площадь Ленина","Первомайская","Пролетарская","Тракторный завод","Партизанская","Автозаводская","Могилевская","Шабаны"]
 };
 
-// ============ СОСТОЯНИЕ ============
 let products = [];
 let cart = [];
 let orders = [];
@@ -526,13 +495,8 @@ let showOnlyFavorites = false;
 let currentDiscount = 0;
 let isAdminAuth = false;
 
-// ============ ХЕЛПЕРЫ ============
-function load(key, def) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; }
-}
-function save(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.error(e); }
-}
+function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.error(e); } }
 function showToast(msg, type) {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
@@ -543,7 +507,6 @@ function showToast(msg, type) {
   setTimeout(() => t.remove(), 3000);
 }
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
 function init() {
   products = load(KEY_PRODUCTS, DEFAULT_PRODUCTS);
   cart = load(KEY_CART, []);
@@ -564,6 +527,10 @@ function init() {
     document.body.classList.remove('locked');
   }
 
+  // Значения по умолчанию для Telegram
+  if (!localStorage.getItem(KEY_TG_TOKEN)) localStorage.setItem(KEY_TG_TOKEN, '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U');
+  if (!localStorage.getItem(KEY_TG_CHAT)) localStorage.setItem(KEY_TG_CHAT, '5512515146');
+
   renderProducts();
   renderReviews();
   renderCart();
@@ -571,7 +538,6 @@ function init() {
   attachEvents();
 }
 
-// ============ СОБЫТИЯ ============
 function attachEvents() {
   document.getElementById('age-yes').onclick = () => {
     localStorage.setItem(KEY_AGE, 'true');
@@ -582,15 +548,12 @@ function attachEvents() {
     document.querySelector('.age-content').style.display = 'none';
     document.getElementById('age-denied').style.display = 'block';
   };
-
   document.getElementById('theme-toggle').onclick = () => {
     document.body.classList.toggle('light-theme');
     const isLight = document.body.classList.contains('light-theme');
     document.getElementById('theme-toggle').textContent = isLight ? '☀️' : '🌙';
     localStorage.setItem(KEY_THEME, isLight ? 'light' : 'dark');
   };
-
-  // КОРЗИНА
   document.getElementById('open-cart').onclick = () => {
     document.getElementById('cart-panel').classList.add('open');
     document.getElementById('backdrop').classList.add('open');
@@ -616,8 +579,6 @@ function attachEvents() {
     document.getElementById('checkout-modal').classList.remove('open');
     document.getElementById('backdrop').classList.remove('open');
   };
-
-  // МОИ ЗАЯВКИ
   document.getElementById('open-my-orders').onclick = () => {
     renderMyOrders();
     document.getElementById('my-orders-modal').classList.add('open');
@@ -627,8 +588,6 @@ function attachEvents() {
     document.getElementById('my-orders-modal').classList.remove('open');
     document.getElementById('backdrop').classList.remove('open');
   };
-
-  // Оформление
   document.getElementById('order-branch').onchange = (e) => {
     const sel = document.getElementById('order-metro');
     sel.innerHTML = '<option value="">Выберите...</option>';
@@ -655,8 +614,6 @@ function attachEvents() {
     updateCheckoutTotal();
   };
   document.getElementById('submit-order').onclick = submitOrder;
-
-  // Каталог
   document.getElementById('search').oninput = renderProducts;
   document.getElementById('sort').onchange = renderProducts;
   document.getElementById('filters').onclick = (e) => {
@@ -672,8 +629,6 @@ function attachEvents() {
     showToast(showOnlyFavorites ? 'Показаны избранные' : 'Показаны все');
     renderProducts();
   };
-
-  // Админка
   document.getElementById('secret-btn').onclick = () => {
     if (!isAdminAuth) {
       const pass = prompt('Пароль админки:');
@@ -683,8 +638,6 @@ function attachEvents() {
     document.getElementById('admin-modal').classList.add('open');
     renderAdminTable();
     renderAdminOrders();
-    
-    // Подгрузка настроек ТГ
     document.getElementById('set-tg-token').value = localStorage.getItem(KEY_TG_TOKEN) || '';
     document.getElementById('set-tg-chat').value = localStorage.getItem(KEY_TG_CHAT) || '';
   };
@@ -703,15 +656,11 @@ function attachEvents() {
   document.getElementById('admin-search-orders').oninput = renderAdminOrders;
   document.getElementById('admin-filter-orders').onchange = renderAdminOrders;
   document.getElementById('export-csv').onclick = exportCSV;
-
-  // Настройки ТГ
   document.getElementById('save-tg-settings').onclick = () => {
     localStorage.setItem(KEY_TG_TOKEN, document.getElementById('set-tg-token').value.trim());
     localStorage.setItem(KEY_TG_CHAT, document.getElementById('set-tg-chat').value.trim());
     showToast('Настройки Telegram сохранены');
   };
-
-  // Настройки фона
   document.getElementById('bg-color').oninput = (e) => {
     document.documentElement.style.setProperty('--bg', e.target.value);
     localStorage.setItem(KEY_BG, e.target.value);
@@ -735,28 +684,23 @@ function attachEvents() {
   };
 }
 
-// ============ РЕНДЕР ТОВАРОВ ============
 function renderProducts() {
   const grid = document.getElementById('product-grid');
   const search = document.getElementById('search').value.toLowerCase().trim();
   const sortMode = document.getElementById('sort').value;
-
   let list = products.filter(p => {
     if (search && !p.name.toLowerCase().includes(search) && !p.desc.toLowerCase().includes(search)) return false;
     if (activeFilter !== 'all' && p.category !== activeFilter) return false;
     if (showOnlyFavorites && !favorites.includes(p.id)) return false;
     return true;
   });
-
   if (sortMode === 'price-asc') list.sort((a,b) => a.price - b.price);
   if (sortMode === 'price-desc') list.sort((a,b) => b.price - a.price);
   if (sortMode === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
-
   if (list.length === 0) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Ничего не найдено</div>';
     return;
   }
-
   grid.innerHTML = list.map(p => {
     const isFav = favorites.includes(p.id);
     return `
@@ -778,7 +722,6 @@ function renderProducts() {
   }).join('');
 }
 
-// ============ ОТЗЫВЫ ============
 function renderReviews() {
   const grid = document.getElementById('reviews-grid');
   grid.innerHTML = reviews.map(r => `
@@ -790,7 +733,6 @@ function renderReviews() {
   `).join('');
 }
 
-// ============ КОРЗИНА ============
 function renderCart() {
   const list = document.getElementById('cart-list');
   let total = 0, count = 0;
@@ -842,10 +784,7 @@ function changeQty(id, delta) {
   renderCart();
 }
 
-function removeFromCart(id) {
-  cart = cart.filter(x => x.id !== id);
-  renderCart();
-}
+function removeFromCart(id) { cart = cart.filter(x => x.id !== id); renderCart(); }
 
 function toggleFav(id) {
   if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
@@ -854,7 +793,6 @@ function toggleFav(id) {
   renderProducts();
 }
 
-// ============ ОФОРМЛЕНИЕ ============
 function updateCheckoutTotal() {
   let total = 0;
   cart.forEach(item => {
@@ -871,7 +809,6 @@ async function submitOrder() {
   const branch = document.getElementById('order-branch');
   const metro = document.getElementById('order-metro');
   const time = document.getElementById('order-time');
-  
   let valid = true;
   [name, branch, metro, time].forEach(el => {
     if (!el.value.trim()) { el.classList.add('error'); valid = false; }
@@ -905,7 +842,6 @@ async function submitOrder() {
   orders.push(newOrder);
   save(KEY_ORDERS, orders);
 
-  // Отправка в Telegram (если настроено)
   const tgToken = localStorage.getItem(KEY_TG_TOKEN);
   const tgChat = localStorage.getItem(KEY_TG_CHAT);
   if (tgToken && tgChat) {
@@ -929,9 +865,7 @@ async function submitOrder() {
   updateOrdersCount();
   document.getElementById('checkout-modal').classList.remove('open');
   document.getElementById('backdrop').classList.remove('open');
-  
   showToast('✅ Заявка отправлена! Проверить статус можно в "📋 Мои заявки".', 'success');
-
   name.value = ''; branch.value = ''; time.value = '';
   metro.innerHTML = '<option value="">Сначала ветку...</option>';
   document.getElementById('order-promo').value = '';
@@ -940,32 +874,20 @@ async function submitOrder() {
   document.getElementById('discount-row').style.display = 'none';
 }
 
-// ============ МОИ ЗАЯВКИ (КЛИЕНТ) ============
 function renderMyOrders() {
   const list = document.getElementById('my-orders-list');
   if (orders.length === 0) {
     list.innerHTML = '<p style="text-align:center;color:var(--muted);">У вас пока нет заявок.</p>';
     return;
   }
-
-  // Показываем только последние 10 заявок
   list.innerHTML = [...orders].reverse().slice(0, 10).map(o => {
     const cls = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : '';
-    const statusTxt = { 
-      pending: '<span style="color:#ffd700;">⏳ Ожидает проверки админом</span>', 
-      approved: '<span style="color:#4ade80;">✅ Одобрено! Ждите сообщения</span>', 
-      rejected: '<span style="color:#ff4d4d;">❌ Отклонено</span>' 
-    }[o.status];
-
+    const statusTxt = { pending: '<span style="color:#ffd700;">⏳ Ожидает проверки админом</span>', approved: '<span style="color:#4ade80;">✅ Одобрено! Ждите сообщения</span>', rejected: '<span style="color:#ff4d4d;">❌ Отклонено</span>' }[o.status];
     let msgHtml = '';
     if (o.adminComment) {
-      if (o.status === 'rejected') {
-        msgHtml = `<div class="admin-msg reject">Причина отказа: ${o.adminComment}</div>`;
-      } else {
-        msgHtml = `<div class="admin-msg approve">Сообщение от админа: ${o.adminComment}</div>`;
-      }
+      if (o.status === 'rejected') msgHtml = `<div class="admin-msg reject">Причина отказа: ${o.adminComment}</div>`;
+      else msgHtml = `<div class="admin-msg approve">Сообщение от админа: ${o.adminComment}</div>`;
     }
-    
     return `
       <div class="my-order-card ${cls}">
         <h4 style="margin:0 0 5px;">Заявка от ${o.date}</h4>
@@ -979,7 +901,6 @@ function renderMyOrders() {
   }).join('');
 }
 
-// ============ АДМИН: ЗАЯВКИ ============
 function updateOrdersCount() {
   const el = document.getElementById('orders-count');
   if (el) el.textContent = orders.length;
@@ -989,18 +910,15 @@ function renderAdminOrders() {
   const list = document.getElementById('orders-list');
   const search = document.getElementById('admin-search-orders').value.toLowerCase().trim();
   const filter = document.getElementById('admin-filter-orders').value;
-
   let filtered = orders.filter(o => {
     if (search && !o.name.toLowerCase().includes(search) && !o.metro.toLowerCase().includes(search)) return false;
     if (filter !== 'all' && o.status !== filter) return false;
     return true;
   });
-
   if (filtered.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Заявок нет</div>';
     return;
   }
-
   list.innerHTML = [...filtered].reverse().map(o => {
     const cls = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : '';
     const statusTxt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[o.status];
@@ -1023,8 +941,6 @@ function renderAdminOrders() {
           ${o.discount > 0 ? `<strong>Скидка: ${o.discount}%</strong><br>` : ''}
           <strong style="color:var(--purple-light);font-size:16px;">Итого: ${o.total} руб.</strong>
         </div>
-        
-        <!-- Поле для комментария -->
         <textarea class="admin-msg-input" id="admin-comment-${o.id}" placeholder="Напишите причину отказа или сообщение для клиента...">${o.adminComment || ''}</textarea>
         <button class="btn-save-msg" onclick="saveAdminComment(${o.id})">Сохранить текст</button>
       </div>
@@ -1035,8 +951,7 @@ function renderAdminOrders() {
 function saveAdminComment(id) {
   const o = orders.find(x => x.id === id);
   if (o) {
-    const text = document.getElementById(`admin-comment-${id}`).value.trim();
-    o.adminComment = text;
+    o.adminComment = document.getElementById(`admin-comment-${id}`).value.trim();
     save(KEY_ORDERS, orders);
     showToast('Текст сохранен');
   }
@@ -1044,14 +959,12 @@ function saveAdminComment(id) {
 
 function setStatus(id, status) {
   const o = orders.find(x => x.id === id);
-  if (o) { 
-    // Автоматически сохраняем текст из textarea перед сменой статуса
+  if (o) {
     const text = document.getElementById(`admin-comment-${id}`).value.trim();
     if (text) o.adminComment = text;
-
-    o.status = status; 
-    save(KEY_ORDERS, orders); 
-    renderAdminOrders(); 
+    o.status = status;
+    save(KEY_ORDERS, orders);
+    renderAdminOrders();
     showToast(status === 'approved' ? 'Заявка одобрена' : 'Заявка отклонена');
   }
 }
@@ -1089,7 +1002,6 @@ function exportCSV() {
   a.click();
 }
 
-// ============ АДМИН: ТОВАРЫ ============
 function renderAdminTable() {
   const tbody = document.querySelector('#admin-table tbody');
   tbody.innerHTML = products.map(p => `
@@ -1117,9 +1029,7 @@ function editProd(id, field, val) {
   if (field === 'price') p.price = Number(val);
   else if (field === 'inStock') p.inStock = val;
   else p[field] = val;
-  if (field === 'category') {
-    p.categoryName = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' }[val];
-  }
+  if (field === 'category') p.categoryName = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' }[val];
   save(KEY_PRODUCTS, products);
   renderProducts();
 }
@@ -1133,7 +1043,6 @@ function deleteProd(id) {
   }
 }
 
-// ============ СТАРТ ============
 init();
 </script>
 </body>
