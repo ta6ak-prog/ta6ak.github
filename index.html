@@ -49,7 +49,9 @@ a { color:inherit; text-decoration:none; }
 .favorite-btn.active { color:#ff4d4d; border-color:#ff4d4d; }
 .product-body { padding:19px; display:flex; flex-direction:column; flex-grow:1; }
 .product-body h3 { margin:0 0 8px; font-size:17px; }
-.product-body p { margin:0 0 17px; color:var(--muted); font-size:14px; line-height:1.5; flex-grow:1; }
+.product-body p { margin:0 0 8px; color:var(--muted); font-size:14px; line-height:1.5; }
+.product-body .stock-line { font-size:12px; color:var(--muted); margin-bottom:10px; flex-grow:1; }
+.product-body .stock-line.low { color:#ffb020; }
 .product-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:auto; }
 .price { color:var(--purple-light); font-size:19px; font-weight:900; }
 .add-button { min-height:39px; padding:9px 14px; font-size:13px; }
@@ -339,8 +341,8 @@ a { color:inherit; text-decoration:none; }
               <th style="width:50px;">Иконка</th>
               <th>Название</th>
               <th style="width:90px;">Цена</th>
-              <th style="width:130px;">Категория</th>
-              <th style="width:80px;">В наличии</th>
+              <th style="width:80px;">Кол-во</th>
+              <th style="width:120px;">Категория</th>
               <th style="width:90px;"></th>
             </tr>
           </thead>
@@ -351,6 +353,7 @@ a { color:inherit; text-decoration:none; }
         <h3>Добавить новый товар</h3>
         <input type="text" id="np-name" placeholder="Название товара" class="full">
         <input type="number" id="np-price" placeholder="Цена (руб.)" step="0.01">
+        <input type="number" id="np-stock-count" placeholder="Количество" value="10" min="0" step="1">
         <select id="np-category">
           <option value="liquid">Жидкость</option>
           <option value="snus">Снюс</option>
@@ -359,9 +362,6 @@ a { color:inherit; text-decoration:none; }
         </select>
         <input type="text" id="np-icon" placeholder="Иконка (эмодзи)" value="📦">
         <input type="text" id="np-desc" placeholder="Краткое описание" value="">
-        <label class="full" style="display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px;">
-          <input type="checkbox" id="np-stock" checked style="width:auto;"> В наличии
-        </label>
         <input type="file" id="np-photo" accept="image/*" class="full">
         <button class="button" id="add-product-btn">Добавить товар</button>
       </div>
@@ -397,7 +397,7 @@ const TG_TOKEN_HARDCODED = '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U';
 const TG_CHATS_HARDCODED = '5512515146,8570615330,8736479925';
 const ADMIN_PASSWORD = 'Skitolss';
 
-const KEY_PRODUCTS = 'tuman_products_v6';
+const KEY_PRODUCTS = 'tuman_products_v7';
 const KEY_CART = 'tuman_cart_v5';
 const KEY_FAVORITES = 'tuman_favorites_v5';
 const KEY_THEME = 'tuman_theme_v5';
@@ -412,101 +412,103 @@ const PICKUP_POINTS = {
 };
 const MAX_TIME = "22:40";
 
-const DEFAULT_PRODUCTS = [
-  { id:1, name:"Annima Love 50mg — Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", inStock:true, photo:"" },
-  { id:2, name:"Annima Love 50mg — Черника гранат", price:15, desc:"🫐❤️", category:"liquid", categoryName:"Жидкость", icon:"❤️", inStock:true, photo:"" },
-  { id:3, name:"BJORN ZLOY 60mg — Энергетик Виноград", price:15, desc:"⚡️🍇", category:"liquid", categoryName:"Жидкость", icon:"🐻", inStock:true, photo:"" },
-  { id:4, name:"BJORN ZLOY 60mg — Виноград Вишня", price:15, desc:"🍇🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", inStock:true, photo:"" },
-  { id:5, name:"BJORN ZLOY 60mg — Лесные Ягоды", price:15, desc:"🍓🫐", category:"liquid", categoryName:"Жидкость", icon:"🐻", inStock:true, photo:"" },
-  { id:6, name:"BJORN ZLOY 60mg — Вишня", price:15, desc:"🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", inStock:true, photo:"" },
-  { id:7, name:"BJORN ZLOY 60mg — Грейпфрут с Черешней", price:15, desc:"🍊🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", inStock:true, photo:"" },
-  { id:8, name:"Catswill Sour 50mg — Газировка Лимон Груша", price:15, desc:"🥤🍋🍐", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:9, name:"Catswill Sour 50mg — Грейпфрут с Вишней", price:15, desc:"🍊🍒", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:10, name:"Catswill Sour 50mg — Чупа-чупс Грейпфрут Клубника", price:15, desc:"🍭🍓", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:11, name:"Catswill Sour 50mg — Яблоко Маракуйя", price:15, desc:"🍏🥭", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:12, name:"Catswill Sour 50mg — Яблочная Кислинка", price:15, desc:"🍏⚡️", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:13, name:"Catswill Sour 50mg — Яблочная Конфета с Грушей", price:15, desc:"🍬🍏🍐", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:14, name:"Catswill Sour 50mg — Яблочно-Клубничная Шипучка", price:15, desc:"🫧🍏🍓", category:"liquid", categoryName:"Жидкость", icon:"🍋", inStock:true, photo:"" },
-  { id:15, name:"DUALL salt 20mg — Киви Гуава", price:15, desc:"🥝🍈", category:"liquid", categoryName:"Жидкость", icon:"❄️", inStock:true, photo:"" },
-  { id:16, name:"DUALL salt 20mg — Кола Лимон", price:15, desc:"🥤🍋", category:"liquid", categoryName:"Жидкость", icon:"❄️", inStock:true, photo:"" },
-  { id:17, name:"DUALL salt 20mg — Манго Кумкват", price:15, desc:"🥭🍊", category:"liquid", categoryName:"Жидкость", icon:"❄️", inStock:true, photo:"" },
-  { id:18, name:"DUALL salt 20mg — Морозная Вишня", price:15, desc:"🧊🍒", category:"liquid", categoryName:"Жидкость", icon:"❄️", inStock:true, photo:"" },
-  { id:19, name:"DUALL salt 20mg — Холодная Смородина", price:15, desc:"❄️🫐", category:"liquid", categoryName:"Жидкость", icon:"❄️", inStock:true, photo:"" },
-  { id:20, name:"Злая Монашка Bubble 70mg — Жвачка с Киви и Малиной", price:15, desc:"🫧🥝🍓", category:"liquid", categoryName:"Жидкость", icon:"😈", inStock:true, photo:"" },
-  { id:21, name:"Злая Монашка Bubble 70mg — Мятная Жвачка", price:15, desc:"🌿🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", inStock:true, photo:"" },
-  { id:22, name:"Злая Монашка Bubble 70mg — Цитрусовый Бабл-Гам", price:15, desc:"🍊🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", inStock:true, photo:"" },
-  { id:23, name:"Злая Монашка Bubble 70mg — Черничный Бабл-Гам", price:15, desc:"🫐🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", inStock:true, photo:"" },
-  { id:24, name:"Злая Монашка Bubble 70mg — Чупа-Чупс с Колой", price:15, desc:"🍭🥤", category:"liquid", categoryName:"Жидкость", icon:"😈", inStock:true, photo:"" },
-  { id:25, name:"Злая Монашка Bubble 70mg — Смородиновый Холлс", price:15, desc:"❄️🫐", category:"liquid", categoryName:"Жидкость", icon:"😈", inStock:true, photo:"" },
-  { id:26, name:"Самоубийца V2 DANGER 100mg — Ананас Малина Банан", price:15, desc:"🍍🍓🍌", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:27, name:"Самоубийца V2 DANGER 100mg — Арбузно-Дынный Фреш", price:15, desc:"🍉🍈", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:28, name:"Самоубийца V2 DANGER 100mg — Виноград Киви Лед", price:15, desc:"🍇🥝🧊", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:29, name:"Самоубийца V2 DANGER 100mg — Виноград Смородина Мята", price:15, desc:"🍇🫐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:30, name:"Самоубийца V2 DANGER 100mg — Вишневый Йогурт", price:15, desc:"🍒🍦", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:31, name:"Самоубийца V2 DANGER 100mg — Вишневый Холлс", price:15, desc:"❄️🍒", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:32, name:"Самоубийца V2 DANGER 100mg — Вишня Виноград", price:15, desc:"🍒🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:33, name:"Самоубийца V2 DANGER 100mg — Вишня Смородина Лед", price:15, desc:"🍒🫐🧊", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:34, name:"Самоубийца V2 DANGER 100mg — Груша Мята", price:15, desc:"🍐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:35, name:"Самоубийца V2 DANGER 100mg — Дыня Апельсин Клубника", price:15, desc:"🍈🍊🍓", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:36, name:"Самоубийца V2 DANGER 100mg — Зеленый Скиттлс", price:15, desc:"🍏🍬", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:37, name:"Самоубийца V2 DANGER 100mg — Земляника Виноград", price:15, desc:"🍓🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:38, name:"Самоубийца V2 DANGER 100mg — Земляника Малина", price:15, desc:"🍓❤️", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:39, name:"Самоубийца V2 DANGER 100mg — Земляничный Спрайт", price:15, desc:"🍓🥤", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:40, name:"Самоубийца V2 DANGER 100mg — Кислое Яблоко с Ежевикой", price:15, desc:"🍏🫐", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:41, name:"Самоубийца V2 DANGER 100mg — Клубника Ежевика Мята", price:15, desc:"🍓🫐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:42, name:"Самоубийца V2 DANGER 100mg — Кола Лесные Ягоды", price:15, desc:"🥤🫐", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:43, name:"Самоубийца V2 DANGER 100mg — Малина Виноград", price:15, desc:"🍓🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:44, name:"Самоубийца V2 DANGER 100mg — Малиново-Яблочный мохито", price:15, desc:"🍓🍏🍹", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:45, name:"Самоубийца V2 DANGER 100mg — Мультифрукт", price:15, desc:"🍍🥭🍌", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:46, name:"Самоубийца V2 DANGER 100mg — Ягодная Жвачка", price:15, desc:"🍓🫧", category:"liquid", categoryName:"Жидкость", icon:"☠️", inStock:true, photo:"" },
-  { id:47, name:"Catswill Classic 50mg — Морозный Апельсин Маракуйя", price:15, desc:"🧊🍊🥭", category:"liquid", categoryName:"Жидкость", icon:"🐱", inStock:true, photo:"" },
-  { id:48, name:"Catswill Classic 50mg — Сладкий Апельсин Груша Лед", price:15, desc:"🍊🍐❄️", category:"liquid", categoryName:"Жидкость", icon:"🐱", inStock:true, photo:"" },
-  { id:49, name:"PODONKI VINTAGE 50mg — Апельсиновая газировка", price:15, desc:"🍊🥤", category:"liquid", categoryName:"Жидкость", icon:"🎩", inStock:true, photo:"" },
-  { id:50, name:"PODONKI VINTAGE 50mg — Брусничный морс", price:15, desc:"🍒🥤", category:"liquid", categoryName:"Жидкость", icon:"🎩", inStock:true, photo:"" },
-  { id:51, name:"PODONKI VINTAGE 50mg — Земляничный мусс", price:15, desc:"🍓🍨", category:"liquid", categoryName:"Жидкость", icon:"🎩", inStock:true, photo:"" },
-  { id:52, name:"PODONKI VINTAGE 50mg — Пинаколада с грушей", price:15, desc:"🍹🍐", category:"liquid", categoryName:"Жидкость", icon:"🎩", inStock:true, photo:"" },
-  { id:53, name:"PODONKI VINTAGE 50mg — Яблочный лимонад", price:15, desc:"🍏🍋", category:"liquid", categoryName:"Жидкость", icon:"🎩", inStock:true, photo:"" },
-  { id:54, name:"PODONKI VINTAGE 50mg — Освежающий лимонад", price:15, desc:"🍋🧊", category:"liquid", categoryName:"Жидкость", icon:"🎩", inStock:true, photo:"" },
-  { id:55, name:"Rick And Morty Bad Trip 50mg — Киви личи (х2)", price:15, desc:"🥝🍒", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:56, name:"Rick And Morty Bad Trip 50mg — Киви гуава маракуйя (х2)", price:15, desc:"🥝🍈🥭", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:57, name:"Rick And Morty Bad Trip 50mg — Арбуз Малина", price:15, desc:"🍉🍓", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:58, name:"Rick And Morty Bad Trip 50mg — Банан кокос", price:15, desc:"🍌🥥", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:59, name:"Rick And Morty Bad Trip 50mg — Барбарис энергетик", price:15, desc:"🍬⚡️", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:60, name:"Rick And Morty Bad Trip 50mg — Виноград энергетик", price:15, desc:"🍇⚡️", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:61, name:"Rick And Morty Bad Trip 50mg — Гранат клубника", price:15, desc:"❤️🍓", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:62, name:"Rick And Morty Bad Trip 50mg — Гранат Смородина", price:15, desc:"❤️🫐", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:63, name:"Rick And Morty Bad Trip 50mg — Грейпфрутовый швепс", price:15, desc:"🍊🥤", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:64, name:"Rick And Morty Bad Trip 50mg — Земляника драгонфрут", price:15, desc:"🍓🐉", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:65, name:"Rick And Morty Bad Trip 50mg — Клубника банан", price:15, desc:"🍓🍌", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:66, name:"Rick And Morty Bad Trip 50mg — Клубника вишня", price:15, desc:"🍓🍒", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:67, name:"Rick And Morty Bad Trip 50mg — Клубничный мохито", price:15, desc:"🍓🍹", category:"liquid", categoryName:"Жидкость", icon:"🛸", inStock:true, photo:"" },
-  { id:68, name:"Пошлая Рабыня 83mg — Ананасовый сок", price:15, desc:"🍍🧃", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true, photo:"" },
-  { id:69, name:"Пошлая Рабыня 83mg — Арбуз Дыня", price:15, desc:"🍉🍈", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true, photo:"" },
-  { id:70, name:"Пошлая Рабыня 83mg — Кока Кола с Ванилью", price:15, desc:"🥤🍦", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true, photo:"" },
-  { id:71, name:"Пошлая Рабыня 83mg — Passionfruit Манго Маракуйя", price:15, desc:"🥭", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true, photo:"" },
-  { id:72, name:"Пошлая Рабыня 83mg — Цитрусовый Микс", price:15, desc:"🍋🍊", category:"liquid", categoryName:"Жидкость", icon:"⛓️", inStock:true, photo:"" },
-  { id:73, name:"Iceburn Ghetto 150mg — Малина Вишня", price:12, desc:"🍓🍒", category:"snus", categoryName:"Снюс", icon:"🔥", inStock:true, photo:"" },
-  { id:74, name:"Iceburn Ghetto 150mg — Персик Малина", price:12, desc:"🍑🍓", category:"snus", categoryName:"Снюс", icon:"🔥", inStock:true, photo:"" },
-  { id:75, name:"Iceburn Ghetto 150mg — Энергетик Вишня", price:12, desc:"⚡️🍒", category:"snus", categoryName:"Снюс", icon:"🔥", inStock:true, photo:"" },
-  { id:76, name:"Iceburn Monster 75mg — Цитрус", price:12, desc:"🍋🍊", category:"snus", categoryName:"Снюс", icon:"👹", inStock:true, photo:"" },
-  { id:77, name:"Никобустер 2%", price:4, desc:"💧", category:"accessory", categoryName:"Никобустер", icon:"🧪", inStock:true, photo:"" },
-  { id:78, name:"Xros 6 mini — Black (3 шт)", price:60, desc:"🖤", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:79, name:"Xros 6 mini — Titanium black (3 шт)", price:60, desc:"🩶", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:80, name:"Xros 6 mini — Titanium silver (3 шт)", price:60, desc:"🤍", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:81, name:"Xros 6 mini — Plume white (3 шт)", price:60, desc:"🕊️", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:82, name:"Xros 6 mini — Plume pink (1 шт)", price:60, desc:"🌸", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:83, name:"Xros 6 mini — Plume blue (1 шт)", price:60, desc:"🩵", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:84, name:"Xros 6 mini — Jelly pink (2 шт)", price:60, desc:"🩷", category:"device", categoryName:"Под-система", icon:"📱", inStock:true, photo:"" },
-  { id:85, name:"Hero 5 — Crystal Purple", price:95, desc:"💜", category:"device", categoryName:"Под-система", icon:"🛡️", inStock:true, photo:"" },
-  { id:86, name:"Hero 5 — Steel silver", price:95, desc:"⚙️", category:"device", categoryName:"Под-система", icon:"🛡️", inStock:true, photo:"" },
-  { id:87, name:"Hero 5 — Pure white", price:95, desc:"🤍", category:"device", categoryName:"Под-система", icon:"🛡️", inStock:true, photo:"" },
-  { id:88, name:"BRUSKO FEELIN — Черный", price:20, desc:"🖤", category:"device", categoryName:"Под-система", icon:"⚡", inStock:true, photo:"" },
-  { id:89, name:"Картридж xros 0.4 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" },
-  { id:90, name:"Картридж xros 0.6 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" },
-  { id:91, name:"Картридж xros 0.8 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" },
-  { id:92, name:"Испаритель GeekVape 0.2 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" },
-  { id:93, name:"Испаритель Smoant - 0.3 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" }
+const DEFAULT_PRODUCTS_RAW = [
+  { id:1, name:"Annima Love 50mg — Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", stock:20, photo:"" },
+  { id:2, name:"Annima Love 50mg — Черника гранат", price:15, desc:"🫐❤️", category:"liquid", categoryName:"Жидкость", icon:"❤️", stock:20, photo:"" },
+  { id:3, name:"BJORN ZLOY 60mg — Энергетик Виноград", price:15, desc:"⚡️🍇", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
+  { id:4, name:"BJORN ZLOY 60mg — Виноград Вишня", price:15, desc:"🍇🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
+  { id:5, name:"BJORN ZLOY 60mg — Лесные Ягоды", price:15, desc:"🍓🫐", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
+  { id:6, name:"BJORN ZLOY 60mg — Вишня", price:15, desc:"🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
+  { id:7, name:"BJORN ZLOY 60mg — Грейпфрут с Черешней", price:15, desc:"🍊🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
+  { id:8, name:"Catswill Sour 50mg — Газировка Лимон Груша", price:15, desc:"🥤🍋🍐", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:9, name:"Catswill Sour 50mg — Грейпфрут с Вишней", price:15, desc:"🍊🍒", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:10, name:"Catswill Sour 50mg — Чупа-чупс Грейпфрут Клубника", price:15, desc:"🍭🍓", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:11, name:"Catswill Sour 50mg — Яблоко Маракуйя", price:15, desc:"🍏🥭", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:12, name:"Catswill Sour 50mg — Яблочная Кислинка", price:15, desc:"🍏⚡️", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:13, name:"Catswill Sour 50mg — Яблочная Конфета с Грушей", price:15, desc:"🍬🍏🍐", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:14, name:"Catswill Sour 50mg — Яблочно-Клубничная Шипучка", price:15, desc:"🫧🍏🍓", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
+  { id:15, name:"DUALL salt 20mg — Киви Гуава", price:15, desc:"🥝🍈", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
+  { id:16, name:"DUALL salt 20mg — Кола Лимон", price:15, desc:"🥤🍋", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
+  { id:17, name:"DUALL salt 20mg — Манго Кумкват", price:15, desc:"🥭🍊", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
+  { id:18, name:"DUALL salt 20mg — Морозная Вишня", price:15, desc:"🧊🍒", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
+  { id:19, name:"DUALL salt 20mg — Холодная Смородина", price:15, desc:"❄️🫐", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
+  { id:20, name:"Злая Монашка Bubble 70mg — Жвачка с Киви и Малиной", price:15, desc:"🫧🥝🍓", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
+  { id:21, name:"Злая Монашка Bubble 70mg — Мятная Жвачка", price:15, desc:"🌿🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
+  { id:22, name:"Злая Монашка Bubble 70mg — Цитрусовый Бабл-Гам", price:15, desc:"🍊🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
+  { id:23, name:"Злая Монашка Bubble 70mg — Черничный Бабл-Гам", price:15, desc:"🫐🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
+  { id:24, name:"Злая Монашка Bubble 70mg — Чупа-Чупс с Колой", price:15, desc:"🍭🥤", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
+  { id:25, name:"Злая Монашка Bubble 70mg — Смородиновый Холлс", price:15, desc:"❄️🫐", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
+  { id:26, name:"Самоубийца V2 DANGER 100mg — Ананас Малина Банан", price:15, desc:"🍍🍓🍌", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:27, name:"Самоубийца V2 DANGER 100mg — Арбузно-Дынный Фреш", price:15, desc:"🍉🍈", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:28, name:"Самоубийца V2 DANGER 100mg — Виноград Киви Лед", price:15, desc:"🍇🥝🧊", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:29, name:"Самоубийца V2 DANGER 100mg — Виноград Смородина Мята", price:15, desc:"🍇🫐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:30, name:"Самоубийца V2 DANGER 100mg — Вишневый Йогурт", price:15, desc:"🍒🍦", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:31, name:"Самоубийца V2 DANGER 100mg — Вишневый Холлс", price:15, desc:"❄️🍒", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:32, name:"Самоубийца V2 DANGER 100mg — Вишня Виноград", price:15, desc:"🍒🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:33, name:"Самоубийца V2 DANGER 100mg — Вишня Смородина Лед", price:15, desc:"🍒🫐🧊", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:34, name:"Самоубийца V2 DANGER 100mg — Груша Мята", price:15, desc:"🍐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:35, name:"Самоубийца V2 DANGER 100mg — Дыня Апельсин Клубника", price:15, desc:"🍈🍊🍓", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:36, name:"Самоубийца V2 DANGER 100mg — Зеленый Скиттлс", price:15, desc:"🍏🍬", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:37, name:"Самоубийца V2 DANGER 100mg — Земляника Виноград", price:15, desc:"🍓🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:38, name:"Самоубийца V2 DANGER 100mg — Земляника Малина", price:15, desc:"🍓❤️", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:39, name:"Самоубийца V2 DANGER 100mg — Земляничный Спрайт", price:15, desc:"🍓🥤", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:40, name:"Самоубийца V2 DANGER 100mg — Кислое Яблоко с Ежевикой", price:15, desc:"🍏🫐", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:41, name:"Самоубийца V2 DANGER 100mg — Клубника Ежевика Мята", price:15, desc:"🍓🫐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:42, name:"Самоубийца V2 DANGER 100mg — Кола Лесные Ягоды", price:15, desc:"🥤🫐", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:43, name:"Самоубийца V2 DANGER 100mg — Малина Виноград", price:15, desc:"🍓🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:44, name:"Самоубийца V2 DANGER 100mg — Малиново-Яблочный мохито", price:15, desc:"🍓🍏🍹", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:45, name:"Самоубийца V2 DANGER 100mg — Мультифрукт", price:15, desc:"🍍🥭🍌", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:46, name:"Самоубийца V2 DANGER 100mg — Ягодная Жвачка", price:15, desc:"🍓🫧", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
+  { id:47, name:"Catswill Classic 50mg — Морозный Апельсин Маракуйя", price:15, desc:"🧊🍊🥭", category:"liquid", categoryName:"Жидкость", icon:"🐱", stock:20, photo:"" },
+  { id:48, name:"Catswill Classic 50mg — Сладкий Апельсин Груша Лед", price:15, desc:"🍊🍐❄️", category:"liquid", categoryName:"Жидкость", icon:"🐱", stock:20, photo:"" },
+  { id:49, name:"PODONKI VINTAGE 50mg — Апельсиновая газировка", price:15, desc:"🍊🥤", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
+  { id:50, name:"PODONKI VINTAGE 50mg — Брусничный морс", price:15, desc:"🍒🥤", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
+  { id:51, name:"PODONKI VINTAGE 50mg — Земляничный мусс", price:15, desc:"🍓🍨", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
+  { id:52, name:"PODONKI VINTAGE 50mg — Пинаколада с грушей", price:15, desc:"🍹🍐", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
+  { id:53, name:"PODONKI VINTAGE 50mg — Яблочный лимонад", price:15, desc:"🍏🍋", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
+  { id:54, name:"PODONKI VINTAGE 50mg — Освежающий лимонад", price:15, desc:"🍋🧊", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
+  { id:55, name:"Rick And Morty Bad Trip 50mg — Киви личи (х2)", price:15, desc:"🥝🍒", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:56, name:"Rick And Morty Bad Trip 50mg — Киви гуава маракуйя (х2)", price:15, desc:"🥝🍈🥭", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:57, name:"Rick And Morty Bad Trip 50mg — Арбуз Малина", price:15, desc:"🍉🍓", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:58, name:"Rick And Morty Bad Trip 50mg — Банан кокос", price:15, desc:"🍌🥥", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:59, name:"Rick And Morty Bad Trip 50mg — Барбарис энергетик", price:15, desc:"🍬⚡️", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:60, name:"Rick And Morty Bad Trip 50mg — Виноград энергетик", price:15, desc:"🍇⚡️", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:61, name:"Rick And Morty Bad Trip 50mg — Гранат клубника", price:15, desc:"❤️🍓", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:62, name:"Rick And Morty Bad Trip 50mg — Гранат Смородина", price:15, desc:"❤️🫐", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:63, name:"Rick And Morty Bad Trip 50mg — Грейпфрутовый швепс", price:15, desc:"🍊🥤", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:64, name:"Rick And Morty Bad Trip 50mg — Земляника драгонфрут", price:15, desc:"🍓🐉", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:65, name:"Rick And Morty Bad Trip 50mg — Клубника банан", price:15, desc:"🍓🍌", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:66, name:"Rick And Morty Bad Trip 50mg — Клубника вишня", price:15, desc:"🍓🍒", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:67, name:"Rick And Morty Bad Trip 50mg — Клубничный мохито", price:15, desc:"🍓🍹", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
+  { id:68, name:"Пошлая Рабыня 83mg — Ананасовый сок", price:15, desc:"🍍🧃", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
+  { id:69, name:"Пошлая Рабыня 83mg — Арбуз Дыня", price:15, desc:"🍉🍈", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
+  { id:70, name:"Пошлая Рабыня 83mg — Кока Кола с Ванилью", price:15, desc:"🥤🍦", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
+  { id:71, name:"Пошлая Рабыня 83mg — Passionfruit Манго Маракуйя", price:15, desc:"🥭", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
+  { id:72, name:"Пошлая Рабыня 83mg — Цитрусовый Микс", price:15, desc:"🍋🍊", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
+  { id:73, name:"Iceburn Ghetto 150mg — Малина Вишня", price:12, desc:"🍓🍒", category:"snus", categoryName:"Снюс", icon:"🔥", stock:20, photo:"" },
+  { id:74, name:"Iceburn Ghetto 150mg — Персик Малина", price:12, desc:"🍑🍓", category:"snus", categoryName:"Снюс", icon:"🔥", stock:20, photo:"" },
+  { id:75, name:"Iceburn Ghetto 150mg — Энергетик Вишня", price:12, desc:"⚡️🍒", category:"snus", categoryName:"Снюс", icon:"🔥", stock:20, photo:"" },
+  { id:76, name:"Iceburn Monster 75mg — Цитрус", price:12, desc:"🍋🍊", category:"snus", categoryName:"Снюс", icon:"👹", stock:20, photo:"" },
+  { id:77, name:"Никобустер 2%", price:4, desc:"💧", category:"accessory", categoryName:"Никобустер", icon:"🧪", stock:20, photo:"" },
+  { id:78, name:"Xros 6 mini — Black (3 шт)", price:60, desc:"🖤", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:79, name:"Xros 6 mini — Titanium black (3 шт)", price:60, desc:"🩶", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:80, name:"Xros 6 mini — Titanium silver (3 шт)", price:60, desc:"🤍", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:81, name:"Xros 6 mini — Plume white (3 шт)", price:60, desc:"🕊️", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:82, name:"Xros 6 mini — Plume pink (1 шт)", price:60, desc:"🌸", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:83, name:"Xros 6 mini — Plume blue (1 шт)", price:60, desc:"🩵", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:84, name:"Xros 6 mini — Jelly pink (2 шт)", price:60, desc:"🩷", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
+  { id:85, name:"Hero 5 — Crystal Purple", price:95, desc:"💜", category:"device", categoryName:"Под-система", icon:"🛡️", stock:3, photo:"" },
+  { id:86, name:"Hero 5 — Steel silver", price:95, desc:"⚙️", category:"device", categoryName:"Под-система", icon:"🛡️", stock:3, photo:"" },
+  { id:87, name:"Hero 5 — Pure white", price:95, desc:"🤍", category:"device", categoryName:"Под-система", icon:"🛡️", stock:3, photo:"" },
+  { id:88, name:"BRUSKO FEELIN — Черный", price:20, desc:"🖤", category:"device", categoryName:"Под-система", icon:"⚡", stock:10, photo:"" },
+  { id:89, name:"Картридж xros 0.4 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
+  { id:90, name:"Картридж xros 0.6 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
+  { id:91, name:"Картридж xros 0.8 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
+  { id:92, name:"Испаритель GeekVape 0.2 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
+  { id:93, name:"Испаритель Smoant - 0.3 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" }
 ];
+
+const DEFAULT_PRODUCTS = DEFAULT_PRODUCTS_RAW.map(p => ({ ...p, inStock: p.stock > 0 }));
 
 let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
 let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
@@ -529,6 +531,7 @@ function tgAdminChats() {
 }
 function isWeekend() { const d = new Date().getDay(); return d === 0 || d === 6; }
 function halyavaCount() { return Number(localStorage.getItem(KEY_HALYAVA) || '0'); }
+function productAvailable(p) { return (p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock) > 0; }
 
 function toast(msg, type) {
   const c = document.getElementById('toast-container');
@@ -720,17 +723,22 @@ function renderProducts() {
   grid.innerHTML = list.map(p => {
     const fav = favorites.includes(p.id);
     const art = p.photo ? `<img src="${p.photo}" alt="">` : `<div class="product-icon">${p.icon}</div>`;
-    return `<article class="product-card ${p.inStock === false ? 'out-of-stock' : ''}">
+    const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+    const out = stock <= 0;
+    const stockLine = out ? 'Нет в наличии' : `Осталось: ${stock} шт.`;
+    const stockClass = (!out && stock <= 3) ? 'stock-line low' : 'stock-line';
+    return `<article class="product-card ${out ? 'out-of-stock' : ''}">
       <span class="product-tag">${p.categoryName}</span>
-      ${p.inStock === false ? '<span class="out-of-stock-badge">Нет в наличии</span>' : ''}
+      ${out ? '<span class="out-of-stock-badge">Нет в наличии</span>' : ''}
       <button class="favorite-btn ${fav ? 'active' : ''}" onclick="toggleFav(${p.id})">${fav ? '❤️' : '🤍'}</button>
       <div class="product-art">${art}</div>
       <div class="product-body">
         <h3>${p.name}</h3>
         <p>${p.desc}</p>
+        <div class="${stockClass}">${stockLine}</div>
         <div class="product-bottom">
           <span class="price">${p.price} руб.</span>
-          <button class="button add-button" onclick="addToCart(${p.id})" ${p.inStock === false ? 'disabled' : ''}>В корзину</button>
+          <button class="button add-button" onclick="addToCart(${p.id})" ${out ? 'disabled' : ''}>В корзину</button>
         </div>
       </div>
     </article>`;
@@ -768,14 +776,21 @@ function renderCart() {
 
 function addToCart(id) {
   const p = products.find(x => x.id === id);
-  if (!p || p.inStock === false) return toast('Нет в наличии', 'error');
+  if (!p) return;
+  const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+  if (stock <= 0) return toast('Нет в наличии', 'error');
   const item = cart.find(x => x.id === id);
+  const current = item ? item.qty : 0;
+  if (current + 1 > stock) return toast(`В наличии только ${stock} шт.`, 'error');
   if (item) item.qty++; else cart.push({ id, qty: 1 });
   renderCart(); toast(`"${p.name}" добавлен`);
 }
 function changeQty(id, d) {
   const item = cart.find(x => x.id === id);
   if (!item) return;
+  const p = products.find(x => x.id === id);
+  const stock = p ? (p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock) : 0;
+  if (d > 0 && item.qty + d > stock) return toast(`В наличии только ${stock} шт.`, 'error');
   item.qty += d;
   if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
   renderCart();
@@ -811,13 +826,29 @@ async function submitOrder() {
   if (!isWeekend() && !(PICKUP_POINTS[point.value] || []).includes(timeValue)) return toast('Выбери время из списка', 'error');
   if (buyerChat && !/^\d+$/.test(buyerChat)) return toast('Telegram ID — только цифры (узнать у @userinfobot)', 'error');
 
+  for (const item of cart) {
+    const p = products.find(x => x.id === item.id);
+    if (!p) continue;
+    const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+    if (item.qty > stock) return toast(`"${p.name}" — в наличии только ${stock} шт.`, 'error');
+  }
+
   let total = 0;
   const items = cart.map(i => {
     const p = products.find(x => x.id === i.id);
     if (p) total += p.price * i.qty;
-    return { name: p.name, qty: i.qty, price: p.price };
+    return { name: p.name, qty: i.qty, price: p.price, id: i.id };
   });
   const discAmt = total * currentDiscount / 100;
+
+  const stockChanges = cart.map(i => {
+    const p = products.find(x => x.id === i.id);
+    p.stock = (p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock) - i.qty;
+    if (p.stock < 0) p.stock = 0;
+    p.inStock = p.stock > 0;
+    return `${p.id}:${p.stock}`;
+  }).join(',');
+  saveProducts();
 
   const order = {
     id: Date.now(),
@@ -849,7 +880,8 @@ async function submitOrder() {
         discount: order.discount,
         total: order.total,
         status: 'pending',
-        buyerChat: order.buyerChat
+        buyerChat: order.buyerChat,
+        stockChanges: stockChanges
       })
     });
   } catch (e) { console.log('Sheets post error', e); }
@@ -874,7 +906,7 @@ async function submitOrder() {
   }
 
   cart = []; currentDiscount = 0; currentDiscountLabel = '';
-  renderCart();
+  renderCart(); renderProducts();
   document.getElementById('checkout-modal').classList.remove('open');
   document.getElementById('backdrop').classList.remove('open');
   toast('✅ Заявка отправлена!', 'success');
@@ -888,7 +920,7 @@ async function submitOrder() {
 
 function renderMyOrders() {
   const list = document.getElementById('my-orders-list');
-  if (!remoteOrders.length) { list.innerHTML = '<p style="color:var(--muted);text-align:center;">Заказов нет. Нажми обновить в админке.</p>'; return; }
+  if (!remoteOrders.length) { list.innerHTML = '<p style="color:var(--muted);text-align:center;">Заказов нет. Обнови в админке.</p>'; return; }
   const my = remoteOrders.slice(-10).reverse();
   list.innerHTML = my.map(o => {
     const st = o['Статус'] || 'pending';
@@ -979,6 +1011,7 @@ function renderAdminTable() {
   const tbody = document.querySelector('#admin-table tbody');
   tbody.innerHTML = products.map(p => {
     const thumb = p.photo ? `<img src="${p.photo}" class="thumb">` : `<div class="thumb-empty">${p.icon}</div>`;
+    const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
     return `<tr>
       <td><div class="photo-upload">
         ${thumb}
@@ -989,13 +1022,13 @@ function renderAdminTable() {
       <td><input type="text" value="${p.icon}" onchange="editProd(${p.id},'icon',this.value)" style="text-align:center;"></td>
       <td><input type="text" value="${p.name.replace(/"/g,'&quot;')}" onchange="editProd(${p.id},'name',this.value)"></td>
       <td><input type="number" value="${p.price}" onchange="editProd(${p.id},'price',this.value)"></td>
+      <td><input type="number" value="${stock}" min="0" onchange="editProd(${p.id},'stock',this.value)"></td>
       <td><select onchange="editProd(${p.id},'category',this.value)">
         <option value="liquid" ${p.category==='liquid'?'selected':''}>Жидкость</option>
         <option value="snus" ${p.category==='snus'?'selected':''}>Снюс</option>
         <option value="device" ${p.category==='device'?'selected':''}>Под-система</option>
         <option value="accessory" ${p.category==='accessory'?'selected':''}>Расходник</option>
       </select></td>
-      <td style="text-align:center;"><input type="checkbox" ${p.inStock?'checked':''} onchange="editProd(${p.id},'inStock',this.checked)"></td>
       <td><button class="button" style="background:#ff4d4d;color:#fff;padding:5px 10px;" onclick="deleteProd(${p.id})">Удалить</button></td>
     </tr>`;
   }).join('');
@@ -1018,20 +1051,22 @@ function clearProductPhoto(id) {
 function addNewProduct() {
   const name = document.getElementById('np-name').value.trim();
   const price = parseFloat(document.getElementById('np-price').value);
+  const stock = parseInt(document.getElementById('np-stock-count').value, 10);
   const category = document.getElementById('np-category').value;
   const icon = document.getElementById('np-icon').value.trim() || '📦';
   const desc = document.getElementById('np-desc').value.trim();
-  const inStock = document.getElementById('np-stock').checked;
   const file = document.getElementById('np-photo').files[0];
   if (!name) return toast('Введи название', 'error');
   if (isNaN(price) || price <= 0) return toast('Введи цену', 'error');
+  if (isNaN(stock) || stock < 0) return toast('Введи количество', 'error');
   const catNames = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' };
   const id = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
   const finish = (photo) => {
-    products.push({ id, name, price, desc, category, categoryName: catNames[category], icon, inStock, photo: photo || '' });
+    products.push({ id, name, price, desc, category, categoryName: catNames[category], icon, stock, inStock: stock > 0, photo: photo || '' });
     saveProducts(); renderAdminTable(); renderProducts(); toast('Товар добавлен');
     document.getElementById('np-name').value=''; document.getElementById('np-price').value='';
     document.getElementById('np-desc').value=''; document.getElementById('np-photo').value='';
+    document.getElementById('np-stock-count').value = '10';
   };
   if (file) {
     if (file.size > 800*1024) return toast('Фото больше 800 КБ', 'error');
@@ -1041,6 +1076,10 @@ function addNewProduct() {
 function editProd(id, field, val) {
   const p = products.find(x => x.id === id); if (!p) return;
   if (field === 'price') p.price = Number(val);
+  else if (field === 'stock') {
+    p.stock = Math.max(0, parseInt(val, 10) || 0);
+    p.inStock = p.stock > 0;
+  }
   else if (field === 'inStock') p.inStock = val;
   else p[field] = val;
   if (field === 'category') p.categoryName = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' }[val];
