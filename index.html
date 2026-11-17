@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Туман — магазин</title>
+<title>Туманный уголок — магазин</title>
 <style>
 :root { --bg:#10091b; --panel:#1d1230; --purple:#bd77ff; --purple-light:#ddadff; --text:#fbf6ff; --muted:#b8a9c7; --border:rgba(221,173,255,.16); --radius:22px; }
 body.light-theme { --bg:#f4f0f9; --panel:#ffffff; --text:#1d1230; --muted:#6b5b7b; --border:#d1c4e9; }
@@ -34,8 +34,6 @@ a { color:inherit; text-decoration:none; }
 .toolbar { display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap; }
 .search-wrap { position:relative; flex:1; min-width:200px; }
 .search-input, .price-input, .sort-select { width:100%; min-height:46px; border:1px solid var(--border); border-radius:14px; color:var(--text); background:var(--panel); padding:11px 15px; }
-.price-filter { display:flex; gap:10px; }
-.price-input { width:100px; text-align:center; }
 .filters { display:flex; gap:9px; margin-bottom:24px; overflow-x:auto; padding:2px 2px 8px; }
 .filter-button { flex:0 0 auto; min-height:38px; padding:9px 15px; border:1px solid var(--border); border-radius:999px; color:var(--muted); background:transparent; }
 .filter-button.active, .filter-button:hover { border-color:var(--purple); color:var(--text); background:rgba(189,119,255,.17); }
@@ -55,13 +53,9 @@ a { color:inherit; text-decoration:none; }
 .product-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:auto; }
 .price { color:var(--purple-light); font-size:19px; font-weight:900; }
 .add-button { min-height:39px; padding:9px 14px; font-size:13px; }
-.features-section, .reviews-section { padding:40px 0; border-top:1px solid var(--border); }
-.features-grid, .reviews-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
-.feature-card, .review-card { text-align:center; padding:20px; background:var(--panel); border:1px solid var(--border); border-radius:15px; }
-.review-stars { color:#ffd700; font-size:18px; margin-bottom:10px; }
-.review-text { font-style:italic; color:var(--muted); font-size:14px; margin-bottom:15px; }
-.review-author { display:flex; align-items:center; justify-content:center; gap:10px; font-weight:bold; }
-.review-avatar { width:35px; height:35px; border-radius:50%; background:var(--purple); color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+.features-section { padding:40px 0; border-top:1px solid var(--border); }
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+.feature-card { text-align:center; padding:20px; background:var(--panel); border:1px solid var(--border); border-radius:15px; }
 .footer { padding:20px 0; text-align:center; color:var(--muted); border-top:1px solid var(--border); }
 .footer a { color:var(--purple-light); }
 
@@ -171,15 +165,14 @@ a { color:inherit; text-decoration:none; }
 </div>
 
 <div class="admin-secret-btn" id="secret-btn" title="Админ-панель">⚙</div>
-<div class="top-line">Добро пожаловать в «Туманный уголок»</div>
+<div class="top-line">Добро пожаловать в «Туманный уголок» · Доставка по Минску</div>
 
 <header class="site-header">
   <nav class="nav container">
-    <a class="logo" href="#">Туманный уголок<span>✦</span></a>
+    <a class="logo" href="#">ТУМАННЫЙ УГОЛОК<span>✦</span></a>
     <div class="nav-links">
       <a href="#catalog">Каталог</a>
       <a href="#features">Почему мы</a>
-      <a href="#reviews">Отзывы</a> 
     </div>
     <div style="display:flex;gap:10px;align-items:center;">
       <button class="icon-button" id="theme-toggle" style="border:none;font-size:20px;background:transparent;" title="Тема">🌙</button>
@@ -228,16 +221,11 @@ a { color:inherit; text-decoration:none; }
       <div class="feature-card"><div style="font-size:40px;">✅</div><h3 style="color:var(--purple-light)">Только оригинал</h3><p>Работаем напрямую с поставщиками.</p></div>
     </div>
   </div></section>
-
-  <section class="reviews-section container" id="reviews">
-    <div class="section-heading"><h2>Отзывы</h2></div>
-    <div class="reviews-grid" id="reviews-grid"></div>
-  </section>
 </main>
 
 <footer class="footer">
   <div class="container">
-    <p><strong>ТУМАН</strong> · Минск</p> 
+    <p><strong>ТУМАННЫЙ УГОЛОК</strong> · Минск</p>
     <p>Связь: <a href="https://t.me/nekati_n" target="_blank">@nekati_n</a></p>
   </div>
 </footer>
@@ -325,6 +313,7 @@ a { color:inherit; text-decoration:none; }
     <div class="admin-tabs">
       <button class="tab-btn active" data-tab="orders">📋 Заявки</button>
       <button class="tab-btn" data-tab="products">📦 Товары</button>
+      <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
     </div>
 
     <div id="tab-orders" class="tab-content">
@@ -377,6 +366,24 @@ a { color:inherit; text-decoration:none; }
         <button class="button" id="add-product-btn">Добавить товар</button>
       </div>
     </div>
+
+    <div id="tab-settings" class="tab-content" style="display:none;">
+      <h3 style="margin-bottom:15px;">Telegram-бот</h3>
+      <div class="form-group">
+        <label>Токен бота:</label>
+        <input type="text" id="set-tg-token" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
+      </div>
+      <div class="form-group">
+        <label>ID чатов админов (через запятую):</label>
+        <input type="text" id="set-tg-chat" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
+      </div>
+      <h3 style="margin:20px 0 15px;">Google Таблица</h3>
+      <div class="form-group">
+        <label>URL Apps Script:</label>
+        <input type="text" id="set-sheets-url" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
+      </div>
+      <button class="button" id="save-settings" style="margin-bottom:30px;">Сохранить настройки</button>
+    </div>
   </div>
 </div>
 
@@ -385,12 +392,10 @@ a { color:inherit; text-decoration:none; }
 <script>
 "use strict";
 
-// ================== НАСТРОЙКА ==================
-const SHEETS_URL_HARDCODED = 'https://script.google.com/macros/s/AKfycbxPVCgPIHgYM94zqDUUxX4PIXn5SI8I2er970Df4vhwKug0za-08EdJbBCtjiCyEn60/exec';
-const TG_TOKEN = '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U';
-const TG_ADMIN_CHATS = ['5512515146','8570615330','8736479925'];
+const SHEETS_URL_HARDCODED = 'https://script.google.com/macros/s/AKfycbykJzFegxx7Zkco8hYO6j67sgovSKlEfOkfU1IAIjMGSlWTIY4xaTTBGUUrtwF0ULS3/exec';
+const TG_TOKEN_HARDCODED = '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U';
+const TG_CHATS_HARDCODED = '5512515146,8570615330,8736479925';
 const ADMIN_PASSWORD = 'Skitolss';
-// ===============================================
 
 const KEY_PRODUCTS = 'tuman_products_v6';
 const KEY_CART = 'tuman_cart_v5';
@@ -503,16 +508,9 @@ const DEFAULT_PRODUCTS = [
   { id:93, name:"Испаритель Smoant - 0.3 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", inStock:true, photo:"" }
 ];
 
-  const DEFAULT_REVIEWS = [ 
-  { id:1, name:"Алексей", avatar:"А", text:"Заказал на пробу пару вкусов. Доставили на следующий день к метро.", stars:5 }, 
-  { id:2, name:"Марина", avatar:"М", text:"Очень удобный сайт. Заказала Xros mini, быстро договорились.", stars:5 }, 
-  { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный.", stars:4 }
-]; 
-
 let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
 let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
 let favorites = JSON.parse(localStorage.getItem(KEY_FAVORITES) || '[]');
-let reviews = DEFAULT_REVIEWS;
 let remoteOrders = [];
 let activeFilter = 'all';
 let showOnlyFavorites = false;
@@ -523,7 +521,12 @@ let isAdminAuth = false;
 function saveProducts() { localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products)); }
 function saveCart() { localStorage.setItem(KEY_CART, JSON.stringify(cart)); }
 function saveFavorites() { localStorage.setItem(KEY_FAVORITES, JSON.stringify(favorites)); }
-function sheetsUrl() { return SHEETS_URL_HARDCODED; }
+function sheetsUrl() { return localStorage.getItem('tuman_sheets_url') || SHEETS_URL_HARDCODED; }
+function tgToken() { return localStorage.getItem('tuman_tg_token') || TG_TOKEN_HARDCODED; }
+function tgAdminChats() {
+  const s = localStorage.getItem('tuman_tg_chats') || TG_CHATS_HARDCODED;
+  return s.split(',').map(x => x.trim()).filter(Boolean);
+}
 function isWeekend() { const d = new Date().getDay(); return d === 0 || d === 6; }
 function halyavaCount() { return Number(localStorage.getItem(KEY_HALYAVA) || '0'); }
 
@@ -539,7 +542,7 @@ function toast(msg, type) {
 
 async function tgSend(chat, text) {
   try {
-    const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    const r = await fetch(`https://api.telegram.org/bot${tgToken()}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown' })
@@ -558,7 +561,6 @@ function init() {
     document.body.classList.remove('locked');
   }
   renderProducts();
-  renderReviews();
   renderCart();
   attachEvents();
 }
@@ -674,6 +676,9 @@ function attachEvents() {
     document.getElementById('admin-modal').classList.add('open');
     renderAdminTable();
     renderAdminOrders();
+    document.getElementById('set-tg-token').value = tgToken();
+    document.getElementById('set-tg-chat').value = tgAdminChats().join(',');
+    document.getElementById('set-sheets-url').value = sheetsUrl();
   };
   document.getElementById('close-admin').onclick = () => document.getElementById('admin-modal').classList.remove('open');
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -690,6 +695,12 @@ function attachEvents() {
   document.getElementById('admin-filter-orders').onchange = renderAdminOrders;
   document.getElementById('refresh-orders').onclick = renderAdminOrders;
   document.getElementById('add-product-btn').onclick = addNewProduct;
+  document.getElementById('save-settings').onclick = () => {
+    localStorage.setItem('tuman_tg_token', document.getElementById('set-tg-token').value.trim());
+    localStorage.setItem('tuman_tg_chats', document.getElementById('set-tg-chat').value.trim());
+    localStorage.setItem('tuman_sheets_url', document.getElementById('set-sheets-url').value.trim());
+    toast('Настройки сохранены', 'success');
+  };
 }
 
 function renderProducts() {
@@ -724,16 +735,6 @@ function renderProducts() {
       </div>
     </article>`;
   }).join('');
-}
-
-function renderReviews() {
-  document.getElementById('reviews-grid').innerHTML = reviews.map(r => `
-    <div class="review-card">
-      <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
-      <p class="review-text">"${r.text}"</p>
-      <div class="review-author"><div class="review-avatar">${r.avatar}</div> ${r.name}</div>
-    </div>
-  `).join('');
 }
 
 function renderCart() {
@@ -834,7 +835,7 @@ async function submitOrder() {
   };
 
   try {
-    await fetch(SHEETS_URL_HARDCODED, {
+    await fetch(sheetsUrl(), {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
@@ -857,7 +858,7 @@ async function submitOrder() {
   order.items.forEach(i => { adminText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
   if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
   adminText += `\n💰 *Итого: ${order.total} руб.*`;
-  for (const chat of TG_ADMIN_CHATS) await tgSend(chat, adminText);
+  for (const chat of tgAdminChats()) await tgSend(chat, adminText);
 
   if (buyerChat) {
     let buyerText = `✅ *Заказ принят!*\n\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Состав:*\n`;
@@ -905,7 +906,7 @@ function renderMyOrders() {
 
 async function loadRemoteOrders() {
   try {
-    const res = await fetch(SHEETS_URL_HARDCODED + '?t=' + Date.now());
+    const res = await fetch(sheetsUrl() + '?t=' + Date.now());
     remoteOrders = await res.json();
     return true;
   } catch (e) { console.log('load error', e); remoteOrders = []; return false; }
@@ -947,7 +948,7 @@ async function renderAdminOrders() {
 
 async function changeStatus(row, status) {
   try {
-    await fetch(SHEETS_URL_HARDCODED, {
+    await fetch(sheetsUrl(), {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
