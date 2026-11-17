@@ -94,7 +94,6 @@ a { color:inherit; text-decoration:none; }
 .form-group input.error, .form-group select.error { border-color:#ff4d4d; }
 .promo-wrap { display:flex; gap:10px; }
 .promo-wrap input { flex:1; }
-.copy-promo { cursor:pointer; color:var(--purple-light); text-decoration:underline; font-size:12px; }
 .discount-row { display:none; justify-content:space-between; color:#4ade80; font-size:14px; margin-bottom:5px; }
 .total-row { display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin:20px 0; padding-top:15px; border-top:1px solid var(--border); }
 
@@ -105,6 +104,9 @@ a { color:inherit; text-decoration:none; }
 .my-order-card { background:var(--bg); border:1px solid var(--border); padding:15px; border-radius:10px; margin-bottom:15px; border-left:5px solid #ffd700; }
 .my-order-card.approved { border-left-color:#4ade80; }
 .my-order-card.rejected { border-left-color:#ff4d4d; opacity:0.7; }
+.admin-msg { margin-top:10px; padding:10px; border-radius:8px; font-size:13px; }
+.admin-msg.reject { background:rgba(255,77,77,0.1); color:#ff4d4d; border:1px solid rgba(255,77,77,0.3); }
+.admin-msg.approve { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
 
 /* Age gate */
 .age-gate { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(8,4,14,.98); }
@@ -137,6 +139,8 @@ a { color:inherit; text-decoration:none; }
 .order-btn { padding:5px 10px; border:none; border-radius:4px; color:#fff; font-size:12px; font-weight:bold; }
 .btn-copy { background:#3b82f6; } .btn-approve { background:#4ade80; color:#000; } .btn-reject { background:#ff4d4d; } .btn-delete { background:#6b7280; }
 .order-items { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); font-size:13px; }
+.admin-msg-input { width:100%; padding:10px; margin-top:10px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:8px; resize:vertical; font-size:13px; }
+.btn-save-msg { background:var(--purple); color:#000; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:12px; margin-top:5px; cursor:pointer; }
 
 /* Toast */
 .toast-container { position:fixed; bottom:20px; right:20px; z-index:1000; display:flex; flex-direction:column; gap:10px; }
@@ -235,7 +239,7 @@ a { color:inherit; text-decoration:none; }
 <footer class="footer">
   <div class="container">
     <p><strong>ТУМАН</strong> · Минск</p>
-    <p>Связь: <a href="https://t.me/Tuman_corner_bot" target="_blank">@Tuman_corner_bot</a></p>
+    <p>Связь: <a href="https://t.me/nekati_n" target="_blank">@nekati_n</a></p>
   </div>
 </footer>
 
@@ -272,16 +276,15 @@ a { color:inherit; text-decoration:none; }
       <select id="order-branch">
         <option value="">Выберите...</option>
         <option value="red">🔴 Красная</option>
-        <option value="green">🟢 Зеленая</option>
         <option value="blue">🔵 Синяя</option>
       </select>
     </div>
     <div class="form-group"><label>Станция</label><select id="order-metro"><option value="">Сначала ветку...</option></select></div>
     <div class="form-group"><label>Время</label><input type="time" id="order-time"></div>
     <div class="form-group">
-      <label>Промокод <span class="copy-promo" id="copy-promo">(ta6ak11 — скидка 10%)</span></label>
+      <label>Промокод</label>
       <div class="promo-wrap">
-        <input type="text" id="order-promo" placeholder="Код">
+        <input type="text" id="order-promo" placeholder="Введите код...">
         <button type="button" class="button button-secondary" id="apply-promo">ОК</button>
       </div>
       <div id="promo-success" style="color:#4ade80;font-size:12px;margin-top:5px;display:none;">✅ Промокод применен!</div>
@@ -373,15 +376,15 @@ a { color:inherit; text-decoration:none; }
 "use strict";
 
 // ============ КОНСТАНТЫ ============
-const KEY_PRODUCTS = 'tuman_products_v3';
-const KEY_CART = 'tuman_cart_v3';
-const KEY_ORDERS = 'tuman_orders_v3';
-const KEY_REVIEWS = 'tuman_reviews_v3';
-const KEY_FAVORITES = 'tuman_favorites_v3';
-const KEY_THEME = 'tuman_theme_v3';
-const KEY_AGE = 'tuman_age_v3';
-const KEY_BG = 'tuman_bg_v3';
-const KEY_BG_IMG = 'tuman_bg_img_v3';
+const KEY_PRODUCTS = 'tuman_products_v5';
+const KEY_CART = 'tuman_cart_v5';
+const KEY_ORDERS = 'tuman_orders_v5';
+const KEY_REVIEWS = 'tuman_reviews_v5';
+const KEY_FAVORITES = 'tuman_favorites_v5';
+const KEY_THEME = 'tuman_theme_v5';
+const KEY_AGE = 'tuman_age_v5';
+const KEY_BG = 'tuman_bg_v5';
+const KEY_BG_IMG = 'tuman_bg_img_v5';
 const KEY_TG_TOKEN = 'tuman_tg_token';
 const KEY_TG_CHAT = 'tuman_tg_chat';
 const ADMIN_PASSWORD = 'Skitolss';
@@ -498,10 +501,18 @@ const DEFAULT_REVIEWS = [
   { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный, всегда в наличии.", stars:4 }
 ];
 
+// ОТСОРТИРОВАННЫЕ ВЕТКИ МЕТРО (КРАСНАЯ И СИНЯЯ)
 const METRO = {
-  red: ["Октябрьская","Площадь Ленина","Площадь Якуба Коласа","Академия Наук","Парк Челюскинцев","Восток","Московская","Площадь Победы","Купаловская","Первомайская","Пролетарская","Тракторный завод","Партизанская","Автозаводская","Могилевская","Институт Культуры"],
-  green: ["Уручье","Борисовский тракт","Восток","Московская","Площадь Победы","Октябрьская","Купаловская","Немига","Фрунзенская","Молодежная","Спортивная","Кунцевщина","Каменная Горка","Петровщина","Малиновка"],
-  blue: ["Каменная Горка","Кунцевщина","Спортивная","Молодежная","Фрунзенская","Немига","Купаловская","Октябрьская","Площадь Ленина","Первомайская","Пролетарская","Тракторный завод","Партизанская","Автозаводская","Могилевская"]
+  red: [
+    "Малиновка", "Петровщина", "Михалово", "Грушевка", "Площадь Франтишка Богушевича", 
+    "Институт Культуры", "Площадь Ленина", "Октябрьская", "Площадь Победы", "Парк Челюскинцев", 
+    "Академия Наук", "Площадь Якуба Коласа", "Восток", "Борисовский тракт", "Уручье"
+  ],
+  blue: [
+    "Каменная Горка", "Кунцевщина", "Спортивная", "Молодежная", "Фрунзенская", "Немига", 
+    "Купаловская", "Октябрьская", "Площадь Ленина", "Первомайская", "Пролетарская", 
+    "Тракторный завод", "Партизанская", "Автозаводская", "Могилевская", "Шабаны"
+  ]
 };
 
 // ============ СОСТОЯНИЕ ============
@@ -628,9 +639,6 @@ function attachEvents() {
         sel.appendChild(o);
       });
     }
-  };
-  document.getElementById('copy-promo').onclick = () => {
-    navigator.clipboard.writeText('ta6ak11').then(() => showToast('Промокод скопирован'));
   };
   document.getElementById('apply-promo').onclick = () => {
     const code = document.getElementById('order-promo').value.trim();
@@ -878,7 +886,7 @@ async function submitOrder() {
     return { name: p.name, qty: i.qty, price: p.price };
   });
   const discountAmt = (total * currentDiscount) / 100;
-  const branchName = { red: '🔴 Красная', green: '🟢 Зеленая', blue: '🔵 Синяя' }[branch.value];
+  const branchName = { red: '🔴 Красная', blue: '🔵 Синяя' }[branch.value];
 
   const newOrder = {
     id: Date.now(),
@@ -890,7 +898,8 @@ async function submitOrder() {
     items: items,
     discount: currentDiscount,
     total: (total - discountAmt).toFixed(1),
-    status: 'pending'
+    status: 'pending',
+    adminComment: ''
   };
 
   orders.push(newOrder);
@@ -947,6 +956,15 @@ function renderMyOrders() {
       approved: '<span style="color:#4ade80;">✅ Одобрено! Ждите сообщения</span>', 
       rejected: '<span style="color:#ff4d4d;">❌ Отклонено</span>' 
     }[o.status];
+
+    let msgHtml = '';
+    if (o.adminComment) {
+      if (o.status === 'rejected') {
+        msgHtml = `<div class="admin-msg reject">Причина отказа: ${o.adminComment}</div>`;
+      } else {
+        msgHtml = `<div class="admin-msg approve">Сообщение от админа: ${o.adminComment}</div>`;
+      }
+    }
     
     return `
       <div class="my-order-card ${cls}">
@@ -954,6 +972,7 @@ function renderMyOrders() {
         <p style="margin:0 0 5px;font-size:13px;color:var(--muted);">Метро: ${o.metro} · Время: ${o.time}</p>
         <p style="margin:0 0 10px;font-size:13px;">Товары: ${o.items.map(i => i.name).join(', ')}</p>
         <p style="margin:0;font-weight:bold;font-size:15px;">Статус: ${statusTxt}</p>
+        ${msgHtml}
         <p style="margin:5px 0 0;font-size:12px;color:var(--muted);">Итого: ${o.total} руб.</p>
       </div>
     `;
@@ -1004,14 +1023,32 @@ function renderAdminOrders() {
           ${o.discount > 0 ? `<strong>Скидка: ${o.discount}%</strong><br>` : ''}
           <strong style="color:var(--purple-light);font-size:16px;">Итого: ${o.total} руб.</strong>
         </div>
+        
+        <!-- Поле для комментария -->
+        <textarea class="admin-msg-input" id="admin-comment-${o.id}" placeholder="Напишите причину отказа или сообщение для клиента...">${o.adminComment || ''}</textarea>
+        <button class="btn-save-msg" onclick="saveAdminComment(${o.id})">Сохранить текст</button>
       </div>
     `;
   }).join('');
 }
 
+function saveAdminComment(id) {
+  const o = orders.find(x => x.id === id);
+  if (o) {
+    const text = document.getElementById(`admin-comment-${id}`).value.trim();
+    o.adminComment = text;
+    save(KEY_ORDERS, orders);
+    showToast('Текст сохранен');
+  }
+}
+
 function setStatus(id, status) {
   const o = orders.find(x => x.id === id);
   if (o) { 
+    // Автоматически сохраняем текст из textarea перед сменой статуса
+    const text = document.getElementById(`admin-comment-${id}`).value.trim();
+    if (text) o.adminComment = text;
+
     o.status = status; 
     save(KEY_ORDERS, orders); 
     renderAdminOrders(); 
@@ -1040,10 +1077,10 @@ function copyOrder(id) {
 
 function exportCSV() {
   if (orders.length === 0) return showToast('Нет заявок', 'error');
-  let csv = 'ID;Дата;Клиент;Ветка;Метро;Время;Товары;Скидка;Итого;Статус\n';
+  let csv = 'ID;Дата;Клиент;Ветка;Метро;Время;Товары;Скидка;Итого;Статус;Комментарий\n';
   orders.forEach(o => {
     const items = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-    csv += `${o.id};${o.date};${o.name};${o.branch};${o.metro};${o.time};"${items}";${o.discount}%;${o.total};${o.status}\n`;
+    csv += `${o.id};${o.date};${o.name};${o.branch};${o.metro};${o.time};"${items}";${o.discount}%;${o.total};${o.status};"${o.adminComment || ''}"\n`;
   });
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
