@@ -60,7 +60,6 @@ a { color:inherit; text-decoration:none; }
 .feature-card { text-align:center; padding:20px; background:var(--panel); border:1px solid var(--border); border-radius:15px; }
 .footer { padding:20px 0; text-align:center; color:var(--muted); border-top:1px solid var(--border); }
 .footer a { color:var(--purple-light); }
-
 .backdrop { position:fixed; inset:0; z-index:19; visibility:hidden; background:rgba(0,0,0,.7); opacity:0; transition:.25s; }
 .backdrop.open { visibility:visible; opacity:1; }
 .cart-panel { position:fixed; top:0; right:0; z-index:20; width:min(430px,100%); height:100dvh; display:flex; flex-direction:column; padding:23px; background:var(--panel); border-left:1px solid var(--border); transform:translateX(105%); transition:transform .28s; }
@@ -79,7 +78,6 @@ a { color:inherit; text-decoration:none; }
 .cart-item-name { font-weight:bold; margin-bottom:5px; font-size:14px; }
 .cart-item-price { font-size:12px; color:var(--muted); }
 .cart-item-total { font-weight:bold; color:var(--purple-light); white-space:nowrap; }
-
 .checkout-modal { position:fixed; inset:0; z-index:110; display:none; background:rgba(0,0,0,.85); padding:20px; overflow-y:auto; align-items:center; justify-content:center; }
 .checkout-modal.open { display:flex; }
 .checkout-content { width:100%; max-width:550px; padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
@@ -91,19 +89,16 @@ a { color:inherit; text-decoration:none; }
 .promo-wrap input { flex:1; }
 .discount-row { display:none; justify-content:space-between; color:#4ade80; font-size:14px; margin-bottom:5px; }
 .total-row { display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin:20px 0; padding-top:15px; border-top:1px solid var(--border); }
-
 .my-orders-modal { position:fixed; inset:0; z-index:105; display:none; background:rgba(0,0,0,.85); padding:20px; overflow-y:auto; align-items:center; justify-content:center; }
 .my-orders-modal.open { display:flex; }
 .my-orders-content { width:100%; max-width:600px; padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
 .my-order-card { background:var(--bg); border:1px solid var(--border); padding:15px; border-radius:10px; margin-bottom:15px; border-left:5px solid #ffd700; }
 .my-order-card.approved { border-left-color:#4ade80; }
 .my-order-card.rejected { border-left-color:#ff4d4d; opacity:0.7; }
-
 .age-gate { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(8,4,14,.98); }
 .age-gate.hidden { display:none; }
 .age-card { width:min(440px,100%); padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:24px; text-align:center; }
 .age-actions { display:flex; justify-content:center; gap:10px; margin-top:20px; }
-
 .admin-modal { position:fixed; inset:0; z-index:100; display:none; background:rgba(0,0,0,.9); padding:20px; overflow-y:auto; }
 .admin-modal.open { display:block; }
 .admin-content { max-width:1100px; margin:20px auto; padding:30px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
@@ -128,7 +123,6 @@ a { color:inherit; text-decoration:none; }
 .order-btn { padding:5px 10px; border:none; border-radius:4px; color:#fff; font-size:12px; font-weight:bold; cursor:pointer; }
 .btn-approve { background:#4ade80; color:#000; } .btn-reject { background:#ff4d4d; }
 .order-items { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); font-size:13px; }
-
 .thumb { width:44px; height:44px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:var(--bg); display:block; }
 .thumb-empty { width:44px; height:44px; border-radius:8px; border:1px dashed var(--border); display:grid; place-items:center; color:var(--muted); font-size:18px; background:var(--bg); }
 .photo-upload { display:flex; align-items:center; gap:6px; }
@@ -137,11 +131,9 @@ a { color:inherit; text-decoration:none; }
 .photo-upload .clear-photo { padding:5px 8px; border-radius:6px; background:#ff4d4d; color:#fff; border:none; font-weight:bold; font-size:11px; cursor:pointer; }
 .admin-form h3 { grid-column:span 2; margin:0 0 5px; font-size:16px; }
 .admin-form .full { grid-column:span 2; }
-
 .toast-container { position:fixed; bottom:20px; right:20px; z-index:1000; display:flex; flex-direction:column; gap:10px; }
 .toast { padding:15px 20px; background:var(--panel); border:1px solid var(--purple); border-radius:10px; font-weight:bold; animation:slideIn .3s; }
 @keyframes slideIn { from{transform:translateX(100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
-
 @media (max-width:820px) { .product-grid { grid-template-columns:repeat(2,1fr); } .nav-links { display:none; } }
 @media (max-width:600px) { .product-grid { grid-template-columns:1fr; } .admin-form { grid-template-columns:1fr; } .admin-form button { grid-column:span 1; } .admin-form h3, .admin-form .full { grid-column:span 1; } .order-actions { position:relative; top:0; right:0; margin-bottom:10px; } }
 </style>
@@ -333,6 +325,9 @@ a { color:inherit; text-decoration:none; }
     </div>
 
     <div id="tab-products" class="tab-content" style="display:none;">
+      <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+        <button class="button button-secondary" id="reload-products">🔄 Обновить с сервера</button>
+      </div>
       <div style="overflow-x:auto;">
         <table class="admin-table" id="admin-table">
           <thead>
@@ -392,17 +387,20 @@ a { color:inherit; text-decoration:none; }
 <script>
 "use strict";
 
+/* ===== КОНСТАНТЫ ===== */
 const SHEETS_URL_HARDCODED = 'https://script.google.com/macros/s/AKfycbykJzFegxx7Zkco8hYO6j67sgovSKlEfOkfU1IAIjMGSlWTIY4xaTTBGUUrtwF0ULS3/exec';
 const TG_TOKEN_HARDCODED = '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U';
 const TG_CHATS_HARDCODED = '5512515146,8570615330,8736479925';
 const ADMIN_PASSWORD = 'Skitolss';
 
-const KEY_PRODUCTS = 'tuman_products_v7';
+const KEY_PRODUCTS = 'tuman_products_v8';
 const KEY_CART = 'tuman_cart_v5';
 const KEY_FAVORITES = 'tuman_favorites_v5';
 const KEY_THEME = 'tuman_theme_v5';
 const KEY_AGE = 'tuman_age_v5';
 const KEY_HALYAVA = 'tuman_promo_halyava';
+const KEY_MY_CHAT = 'tuman_my_chat';
+const KEY_PRODUCTS_TS = 'tuman_products_ts';
 
 const PICKUP_POINTS = {
   "Партизанская ст.м": ["16:30","18:00","21:00"],
@@ -411,6 +409,8 @@ const PICKUP_POINTS = {
   "Площадь Ленина": ["19:00","20:30","21:30"]
 };
 const MAX_TIME = "22:40";
+const PRODUCTS_TTL = 5 * 60 * 1000;
+const CATEGORY_NAMES = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' };
 
 const DEFAULT_PRODUCTS_RAW = [
   { id:1, name:"Annima Love 50mg — Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", stock:20, photo:"" },
@@ -510,6 +510,7 @@ const DEFAULT_PRODUCTS_RAW = [
 
 const DEFAULT_PRODUCTS = DEFAULT_PRODUCTS_RAW.map(p => ({ ...p, inStock: p.stock > 0 }));
 
+/* ===== СОСТОЯНИЕ ===== */
 let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
 let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
 let favorites = JSON.parse(localStorage.getItem(KEY_FAVORITES) || '[]');
@@ -519,8 +520,31 @@ let showOnlyFavorites = false;
 let currentDiscount = 0;
 let currentDiscountLabel = '';
 let isAdminAuth = false;
+let isSubmitting = false;
 
-function saveProducts() { localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products)); }
+/* ===== УТИЛИТЫ ===== */
+function escapeHtml(v) {
+  if (v === null || v === undefined) return '';
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function escapeMd(s) {
+  return String(s).replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$1');
+}
+function getStock(p) {
+  if (!p) return 0;
+  const s = (p.stock === undefined) ? (p.inStock ? 1 : 0) : p.stock;
+  return Math.max(0, Number(s) || 0);
+}
+function debounce(fn, ms = 300) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+function saveProducts() { try { localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products)); } catch(e) { console.log('saveProducts error', e); } }
 function saveCart() { localStorage.setItem(KEY_CART, JSON.stringify(cart)); }
 function saveFavorites() { localStorage.setItem(KEY_FAVORITES, JSON.stringify(favorites)); }
 function sheetsUrl() { return localStorage.getItem('tuman_sheets_url') || SHEETS_URL_HARDCODED; }
@@ -531,7 +555,6 @@ function tgAdminChats() {
 }
 function isWeekend() { const d = new Date().getDay(); return d === 0 || d === 6; }
 function halyavaCount() { return Number(localStorage.getItem(KEY_HALYAVA) || '0'); }
-function productAvailable(p) { return (p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock) > 0; }
 
 function toast(msg, type) {
   const c = document.getElementById('toast-container');
@@ -543,18 +566,88 @@ function toast(msg, type) {
   setTimeout(() => t.remove(), 3000);
 }
 
-async function tgSend(chat, text) {
-  try {
-    const r = await fetch(`https://api.telegram.org/bot${tgToken()}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown' })
-    });
-    return await r.json();
-  } catch (e) { return { ok: false, error: String(e) }; }
+async function tgSend(chat, text, retries = 2) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${tgToken()}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown' })
+      });
+      const j = await r.json();
+      if (j.ok) return j;
+      if (j.error_code === 429) {
+        await new Promise(r => setTimeout(r, (j.parameters?.retry_after || 1) * 1000));
+        continue;
+      }
+      if (j.error_code === 400) { console.error('TG 400:', j.description); return j; }
+    } catch (e) {
+      if (i === retries) return { ok: false, error: String(e) };
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+  return { ok: false, error: 'max retries' };
 }
 
-function init() {
+/* ===== СИНХРОНИЗАЦИЯ С СЕРВЕРОМ ===== */
+async function loadProductsFromServer(force = false) {
+  const ts = Number(localStorage.getItem(KEY_PRODUCTS_TS) || '0');
+  if (!force && Date.now() - ts < PRODUCTS_TTL) return true;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    const res = await fetch(sheetsUrl() + '?action=products&t=' + Date.now(), { signal: ctrl.signal });
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      products = data.map(p => ({ ...p, inStock: Number(p.stock) > 0 }));
+      saveProducts();
+      localStorage.setItem(KEY_PRODUCTS_TS, String(Date.now()));
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.log('products load error', e);
+    return false;
+  } finally { clearTimeout(timer); }
+}
+
+async function saveProductToServer(product) {
+  try {
+    await fetch(sheetsUrl(), {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'saveProduct', product })
+    });
+    return true;
+  } catch (e) { console.log('save product error', e); return false; }
+}
+
+async function deleteProductFromServer(id) {
+  try {
+    await fetch(sheetsUrl(), {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'deleteProduct', id })
+    });
+    return true;
+  } catch (e) { console.log('delete product error', e); return false; }
+}
+
+async function submitStockChanges(changes) {
+  try {
+    await fetch(sheetsUrl(), {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'stockChanges', changes })
+    });
+  } catch (e) { console.log('stock changes error', e); }
+}
+
+/* ===== ИНИЦИАЛИЗАЦИЯ ===== */
+async function init() {
   if (localStorage.getItem(KEY_THEME) === 'light') {
     document.body.classList.add('light-theme');
     document.getElementById('theme-toggle').textContent = '☀️';
@@ -566,6 +659,8 @@ function init() {
   renderProducts();
   renderCart();
   attachEvents();
+  await loadProductsFromServer();
+  renderProducts();
 }
 
 function attachEvents() {
@@ -596,7 +691,13 @@ function attachEvents() {
     document.querySelectorAll('.cart-panel,.checkout-modal,.my-orders-modal').forEach(el => el.classList.remove('open'));
     document.getElementById('backdrop').classList.remove('open');
   };
-  document.getElementById('clear-cart').onclick = () => { if (confirm('Очистить?')) { cart = []; saveCart(); renderCart(); } };
+  document.getElementById('clear-cart').onclick = () => {
+    if (confirm('Очистить?')) {
+      cart = []; currentDiscount = 0; currentDiscountLabel = '';
+      saveCart(); renderCart();
+      document.getElementById('discount-row').style.display = 'none';
+    }
+  };
   document.getElementById('open-checkout').onclick = () => {
     if (!cart.length) return toast('Корзина пуста', 'error');
     document.querySelectorAll('.cart-panel').forEach(el => el.classList.remove('open'));
@@ -607,10 +708,13 @@ function attachEvents() {
     document.getElementById('checkout-modal').classList.remove('open');
     document.getElementById('backdrop').classList.remove('open');
   };
-  document.getElementById('open-my-orders').onclick = () => {
-    renderMyOrders();
+  document.getElementById('open-my-orders').onclick = async () => {
+    const list = document.getElementById('my-orders-list');
+    list.innerHTML = '<p style="color:var(--muted);text-align:center;">Загрузка...</p>';
     document.getElementById('my-orders-modal').classList.add('open');
     document.getElementById('backdrop').classList.add('open');
+    await loadRemoteOrders();
+    renderMyOrders();
   };
   document.getElementById('close-my-orders').onclick = () => {
     document.getElementById('my-orders-modal').classList.remove('open');
@@ -644,9 +748,9 @@ function attachEvents() {
         s.style.display = 'none'; e.style.display = 'block'; d.style.display = 'none';
         e.textContent = '❌ ХАЛЯВА исчерпана (5/5)'; return;
       }
-      currentDiscount = 0.05; currentDiscountLabel = 'ХАЛЯВА';
-      s.textContent = '✅ ХАЛЯВА: скидка 0.05%'; s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
-      pct.textContent = '0.05';
+      currentDiscount = 5; currentDiscountLabel = 'ХАЛЯВА';
+      s.textContent = '✅ ХАЛЯВА: скидка 5%'; s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
+      pct.textContent = '5';
     } else {
       currentDiscount = 0; currentDiscountLabel = '';
       s.style.display = 'none'; e.style.display = 'block'; d.style.display = 'none';
@@ -655,7 +759,7 @@ function attachEvents() {
     updateCheckoutTotal();
   };
   document.getElementById('submit-order').onclick = submitOrder;
-  document.getElementById('search').oninput = renderProducts;
+  document.getElementById('search').oninput = debounce(renderProducts, 150);
   document.getElementById('sort').onchange = renderProducts;
   document.getElementById('filters').onclick = (e) => {
     if (e.target.classList.contains('filter-button')) {
@@ -694,10 +798,16 @@ function attachEvents() {
       if (btn.dataset.tab === 'products') renderAdminTable();
     };
   });
-  document.getElementById('admin-search-orders').oninput = renderAdminOrders;
+  document.getElementById('admin-search-orders').oninput = debounce(renderAdminOrders, 350);
   document.getElementById('admin-filter-orders').onchange = renderAdminOrders;
-  document.getElementById('refresh-orders').onclick = renderAdminOrders;
+  document.getElementById('refresh-orders').onclick = () => renderAdminOrders(true);
   document.getElementById('add-product-btn').onclick = addNewProduct;
+  document.getElementById('reload-products').onclick = async () => {
+    await loadProductsFromServer(true);
+    renderAdminTable();
+    renderProducts();
+    toast('Товары обновлены', 'success');
+  };
   document.getElementById('save-settings').onclick = () => {
     localStorage.setItem('tuman_tg_token', document.getElementById('set-tg-token').value.trim());
     localStorage.setItem('tuman_tg_chats', document.getElementById('set-tg-chat').value.trim());
@@ -706,45 +816,50 @@ function attachEvents() {
   };
 }
 
+/* ===== РЕНДЕР ТОВАРОВ ===== */
 function renderProducts() {
   const grid = document.getElementById('product-grid');
   const q = document.getElementById('search').value.toLowerCase().trim();
   const sort = document.getElementById('sort').value;
   let list = products.filter(p => {
-    if (q && !p.name.toLowerCase().includes(q) && !p.desc.toLowerCase().includes(q)) return false;
+    if (q && !String(p.name).toLowerCase().includes(q) && !String(p.desc).toLowerCase().includes(q)) return false;
     if (activeFilter !== 'all' && p.category !== activeFilter) return false;
     if (showOnlyFavorites && !favorites.includes(p.id)) return false;
     return true;
   });
   if (sort === 'price-asc') list.sort((a,b) => a.price - b.price);
   if (sort === 'price-desc') list.sort((a,b) => b.price - a.price);
-  if (sort === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
+  if (sort === 'name') list.sort((a,b) => String(a.name).localeCompare(String(b.name)));
   if (!list.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Ничего не найдено</div>'; return; }
   grid.innerHTML = list.map(p => {
     const fav = favorites.includes(p.id);
-    const art = p.photo ? `<img src="${p.photo}" alt="">` : `<div class="product-icon">${p.icon}</div>`;
-    const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+    const safePhoto = (typeof p.photo === 'string' && /^(https?:|data:image\/)/.test(p.photo)) ? p.photo : '';
+    const art = safePhoto
+      ? `<img src="${escapeHtml(safePhoto)}" alt="${escapeHtml(p.name)}" loading="lazy">`
+      : `<div class="product-icon">${escapeHtml(p.icon)}</div>`;
+    const stock = getStock(p);
     const out = stock <= 0;
     const stockLine = out ? 'Нет в наличии' : `Осталось: ${stock} шт.`;
     const stockClass = (!out && stock <= 3) ? 'stock-line low' : 'stock-line';
     return `<article class="product-card ${out ? 'out-of-stock' : ''}">
-      <span class="product-tag">${p.categoryName}</span>
+      <span class="product-tag">${escapeHtml(p.categoryName)}</span>
       ${out ? '<span class="out-of-stock-badge">Нет в наличии</span>' : ''}
-      <button class="favorite-btn ${fav ? 'active' : ''}" onclick="toggleFav(${p.id})">${fav ? '❤️' : '🤍'}</button>
+      <button class="favorite-btn ${fav ? 'active' : ''}" onclick="toggleFav(${Number(p.id)})" aria-pressed="${fav}" aria-label="В избранное">${fav ? '❤️' : '🤍'}</button>
       <div class="product-art">${art}</div>
       <div class="product-body">
-        <h3>${p.name}</h3>
-        <p>${p.desc}</p>
+        <h3>${escapeHtml(p.name)}</h3>
+        <p>${escapeHtml(p.desc)}</p>
         <div class="${stockClass}">${stockLine}</div>
         <div class="product-bottom">
-          <span class="price">${p.price} руб.</span>
-          <button class="button add-button" onclick="addToCart(${p.id})" ${out ? 'disabled' : ''}>В корзину</button>
+          <span class="price">${escapeHtml(p.price)} руб.</span>
+          <button class="button add-button" onclick="addToCart(${Number(p.id)})" ${out ? 'disabled' : ''}>В корзину</button>
         </div>
       </div>
     </article>`;
   }).join('');
 }
 
+/* ===== КОРЗИНА ===== */
 function renderCart() {
   const list = document.getElementById('cart-list');
   let total = 0, count = 0;
@@ -756,28 +871,28 @@ function renderCart() {
       total += p.price * item.qty; count += item.qty;
       return `<li>
         <div class="cart-item-info">
-          <div class="cart-item-name">${p.name}</div>
+          <div class="cart-item-name">${escapeHtml(p.name)}</div>
           <div class="qty-controls">
-            <button class="qty-btn" onclick="changeQty(${p.id},-1)">−</button>
-            <span class="qty-val">${item.qty}</span>
-            <button class="qty-btn" onclick="changeQty(${p.id},1)">+</button>
+            <button class="qty-btn" onclick="changeQty(${Number(p.id)},-1)">−</button>
+            <span class="qty-val">${Number(item.qty)}</span>
+            <button class="qty-btn" onclick="changeQty(${Number(p.id)},1)">+</button>
           </div>
-          <div class="cart-item-price">${p.price} руб./шт</div>
+          <div class="cart-item-price">${escapeHtml(p.price)} руб./шт</div>
         </div>
-        <div class="cart-item-total">${p.price * item.qty} руб.</div>
-        <button class="remove-btn" onclick="removeFromCart(${p.id})">✕</button>
+        <div class="cart-item-total">${(p.price * item.qty).toFixed(2)} руб.</div>
+        <button class="remove-btn" onclick="removeFromCart(${Number(p.id)})" aria-label="Удалить">✕</button>
       </li>`;
     }).join('');
   }
   document.getElementById('cart-count').textContent = count;
-  document.getElementById('cart-total').textContent = total;
+  document.getElementById('cart-total').textContent = total.toFixed(2);
   saveCart();
 }
 
 function addToCart(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
-  const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+  const stock = getStock(p);
   if (stock <= 0) return toast('Нет в наличии', 'error');
   const item = cart.find(x => x.id === id);
   const current = item ? item.qty : 0;
@@ -789,7 +904,7 @@ function changeQty(id, d) {
   const item = cart.find(x => x.id === id);
   if (!item) return;
   const p = products.find(x => x.id === id);
-  const stock = p ? (p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock) : 0;
+  const stock = p ? getStock(p) : 0;
   if (d > 0 && item.qty + d > stock) return toast(`В наличии только ${stock} шт.`, 'error');
   item.qty += d;
   if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
@@ -810,7 +925,9 @@ function updateCheckoutTotal() {
   document.getElementById('final-total').textContent = `${(total - disc).toFixed(2)} руб.`;
 }
 
+/* ===== ОФОРМЛЕНИЕ ЗАКАЗА ===== */
 async function submitOrder() {
+  if (isSubmitting) return;
   const name = document.getElementById('order-name');
   const tg = document.getElementById('order-tg');
   const point = document.getElementById('order-point');
@@ -819,6 +936,7 @@ async function submitOrder() {
   const buyerChat = tg.value.trim();
   const timeValue = isWeekend() ? timeCustom.value.trim() : timeSel.value;
 
+  if (!cart.length) return toast('Корзина пуста', 'error');
   if (!name.value.trim()) { name.classList.add('error'); return toast('Введи имя', 'error'); }
   if (!point.value) { point.classList.add('error'); return toast('Выбери точку', 'error'); }
   if (!timeValue) return toast('Выбери время', 'error');
@@ -829,150 +947,169 @@ async function submitOrder() {
   for (const item of cart) {
     const p = products.find(x => x.id === item.id);
     if (!p) continue;
-    const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+    const stock = getStock(p);
     if (item.qty > stock) return toast(`"${p.name}" — в наличии только ${stock} шт.`, 'error');
   }
 
-  let total = 0;
-  const items = cart.map(i => {
-    const p = products.find(x => x.id === i.id);
-    if (p) total += p.price * i.qty;
-    return { name: p.name, qty: i.qty, price: p.price, id: i.id };
-  });
-  const discAmt = total * currentDiscount / 100;
-
-  const stockChanges = cart.map(i => {
-    const p = products.find(x => x.id === i.id);
-    p.stock = (p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock) - i.qty;
-    if (p.stock < 0) p.stock = 0;
-    p.inStock = p.stock > 0;
-    return `${p.id}:${p.stock}`;
-  }).join(',');
-  saveProducts();
-
-  const order = {
-    id: Date.now(),
-    date: new Date().toLocaleString('ru-RU'),
-    name: name.value.trim(),
-    branch: 'Пункт выдачи',
-    metro: point.value,
-    time: timeValue,
-    items,
-    discount: currentDiscount,
-    discountLabel: currentDiscountLabel,
-    total: (total - discAmt).toFixed(2),
-    status: 'pending',
-    buyerChat
-  };
+  isSubmitting = true;
+  const btn = document.getElementById('submit-order');
+  btn.disabled = true;
 
   try {
-    await fetch(sheetsUrl(), {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({
-        date: order.date,
-        name: order.name,
-        branch: order.branch,
-        metro: order.metro,
-        time: order.time,
-        items: order.items.map(i => `${i.name} x${i.qty}`).join('; '),
-        discount: order.discount,
-        total: order.total,
-        status: 'pending',
-        buyerChat: order.buyerChat,
-        stockChanges: stockChanges
-      })
+    let total = 0;
+    const items = cart.map(i => {
+      const p = products.find(x => x.id === i.id);
+      if (p) total += p.price * i.qty;
+      return { name: p.name, qty: i.qty, price: p.price, id: i.id };
     });
-  } catch (e) { console.log('Sheets post error', e); }
+    const discAmt = total * currentDiscount / 100;
 
-  let adminText = `🔞 *Новый Заказик!🔞*\n\n👤 Клиент: ${order.name}\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Заказ:*\n`;
-  order.items.forEach(i => { adminText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
-  if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
-  adminText += `\n💰 *Итого: ${order.total} руб.*`;
-  for (const chat of tgAdminChats()) await tgSend(chat, adminText);
+    const changes = cart.map(i => ({ id: i.id, delta: -i.qty }));
+    cart.forEach(i => {
+      const p = products.find(x => x.id === i.id);
+      if (p) { p.stock = Math.max(0, getStock(p) - i.qty); p.inStock = p.stock > 0; }
+    });
+    saveProducts();
+    await submitStockChanges(changes);
 
-  if (buyerChat) {
-    let buyerText = `✅ *Заказ принят!*\n\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Состав:*\n`;
-    order.items.forEach(i => { buyerText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
-    if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
-    buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения,по вопросам @nekati_n`;
-    const res = await tgSend(buyerChat, buyerText);
-    if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у @Tuman_corner_bot.', 'error');
+    const order = {
+      id: Date.now(),
+      date: new Date().toLocaleString('ru-RU'),
+      name: name.value.trim(),
+      branch: 'Пункт выдачи',
+      metro: point.value,
+      time: timeValue,
+      items,
+      discount: currentDiscount,
+      discountLabel: currentDiscountLabel,
+      total: (total - discAmt).toFixed(2),
+      status: 'pending',
+      buyerChat
+    };
+
+    try {
+      await fetch(sheetsUrl(), {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          date: order.date,
+          name: order.name,
+          branch: order.branch,
+          metro: order.metro,
+          time: order.time,
+          items: order.items.map(i => `${i.name} x${i.qty}`).join('; '),
+          discount: order.discount,
+          total: order.total,
+          status: 'pending',
+          buyerChat: order.buyerChat
+        })
+      });
+    } catch (e) { console.log('Sheets post error', e); }
+
+    let adminText = `🔞 *Новый Заказик!🔞*\n\n👤 Клиент: ${escapeMd(order.name)}\n📍 Точка: ${escapeMd(order.metro)}\n⏰ Время: ${escapeMd(order.time)}\n\n🛒 *Заказ:*\n`;
+    order.items.forEach(i => { adminText += `• ${escapeMd(i.name)} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
+    if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}% (${escapeMd(order.discountLabel)})`;
+    adminText += `\n💰 *Итого: ${order.total} руб.*`;
+    await Promise.allSettled(tgAdminChats().map(chat => tgSend(chat, adminText)));
+
+    if (buyerChat) {
+      if (!localStorage.getItem(KEY_MY_CHAT)) localStorage.setItem(KEY_MY_CHAT, buyerChat);
+      let buyerText = `✅ *Заказ принят!*\n\n📍 Точка: ${escapeMd(order.metro)}\n⏰ Время: ${escapeMd(order.time)}\n\n🛒 *Состав:*\n`;
+      order.items.forEach(i => { buyerText += `• ${escapeMd(i.name)} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
+      if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}% (${escapeMd(order.discountLabel)})`;
+      buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения, по вопросам @nekati_n`;
+      const res = await tgSend(buyerChat, buyerText);
+      if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у @Tuman_corner_bot.', 'error');
+    }
+
+    if (currentDiscountLabel === 'ХАЛЯВА') {
+      localStorage.setItem(KEY_HALYAVA, String(halyavaCount() + 1));
+    }
+
+    cart = []; currentDiscount = 0; currentDiscountLabel = '';
+    renderCart(); renderProducts();
+    document.getElementById('checkout-modal').classList.remove('open');
+    document.getElementById('backdrop').classList.remove('open');
+    toast('✅ Заявка отправлена!', 'success');
+    name.value = ''; tg.value = ''; point.value = ''; timeSel.value = ''; timeCustom.value = '';
+    document.getElementById('order-promo').value = '';
+    document.getElementById('promo-success').style.display = 'none';
+    document.getElementById('promo-error').style.display = 'none';
+    document.getElementById('discount-row').style.display = 'none';
+    document.getElementById('order-time-custom-wrap').style.display = 'none';
+  } finally {
+    isSubmitting = false;
+    btn.disabled = false;
   }
-
-  if (currentDiscountLabel === 'ХАЛЯВА') {
-    localStorage.setItem(KEY_HALYAVA, String(halyavaCount() + 1));
-  }
-
-  cart = []; currentDiscount = 0; currentDiscountLabel = '';
-  renderCart(); renderProducts();
-  document.getElementById('checkout-modal').classList.remove('open');
-  document.getElementById('backdrop').classList.remove('open');
-  toast('✅ Заявка отправлена!', 'success');
-  name.value = ''; tg.value = ''; point.value = ''; timeSel.value = ''; timeCustom.value = '';
-  document.getElementById('order-promo').value = '';
-  document.getElementById('promo-success').style.display = 'none';
-  document.getElementById('promo-error').style.display = 'none';
-  document.getElementById('discount-row').style.display = 'none';
-  document.getElementById('order-time-custom-wrap').style.display = 'none';
 }
 
+/* ===== МОИ ЗАЯВКИ ===== */
 function renderMyOrders() {
   const list = document.getElementById('my-orders-list');
-  if (!remoteOrders.length) { list.innerHTML = '<p style="color:var(--muted);text-align:center;">Заказов нет. Обнови в админке.</p>'; return; }
-  const my = remoteOrders.slice(-10).reverse();
+  const myChat = localStorage.getItem(KEY_MY_CHAT) || '';
+  let my = remoteOrders;
+  if (myChat) my = my.filter(o => String(o['TelegramID'] || '').trim() === myChat);
+  my = my.slice(-10).reverse();
+  if (!my.length) { list.innerHTML = '<p style="color:var(--muted);text-align:center;">Заказов нет</p>'; return; }
   list.innerHTML = my.map(o => {
     const st = o['Статус'] || 'pending';
     const cls = st === 'approved' ? 'approved' : st === 'rejected' ? 'rejected' : '';
-    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[st] || st;
+    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[st] || escapeHtml(st);
     return `<div class="my-order-card ${cls}">
-      <h4 style="margin:0 0 5px;">${o['Дата'] || ''}</h4>
-      <p style="margin:0 0 5px;font-size:13px;color:var(--muted);">Точка: ${o['Станция'] || ''} · Время: ${o['Время'] || ''}</p>
-      <p style="margin:0 0 5px;font-size:13px;">Товары: ${o['Товары'] || ''}</p>
+      <h4 style="margin:0 0 5px;">${escapeHtml(o['Дата'])}</h4>
+      <p style="margin:0 0 5px;font-size:13px;color:var(--muted);">Точка: ${escapeHtml(o['Станция'])} · Время: ${escapeHtml(o['Время'])}</p>
+      <p style="margin:0 0 5px;font-size:13px;">Товары: ${escapeHtml(o['Товары'])}</p>
       <p style="margin:0;font-weight:bold;">Статус: ${txt}</p>
-      <p style="margin:5px 0 0;font-size:12px;color:var(--muted);">Итого: ${o['Итого'] || ''} руб.</p>
+      <p style="margin:5px 0 0;font-size:12px;color:var(--muted);">Итого: ${escapeHtml(o['Итого'])} руб.</p>
     </div>`;
   }).join('');
 }
 
 async function loadRemoteOrders() {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
-    const res = await fetch(sheetsUrl() + '?t=' + Date.now());
+    const res = await fetch(sheetsUrl() + '?t=' + Date.now(), { signal: ctrl.signal });
     remoteOrders = await res.json();
     return true;
-  } catch (e) { console.log('load error', e); remoteOrders = []; return false; }
+  } catch (e) {
+    console.log('load error', e); remoteOrders = []; return false;
+  } finally { clearTimeout(timer); }
 }
 
-async function renderAdminOrders() {
+async function renderAdminOrders(force = false) {
   const list = document.getElementById('orders-list');
   list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Загрузка...</div>';
   const ok = await loadRemoteOrders();
-  if (!ok) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ff4d4d;">Не удалось загрузить. Проверь URL таблицы и доступ.</div>'; return; }
+  if (!ok) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ff4d4d;">Не удалось загрузить.</div>'; return; }
   const q = document.getElementById('admin-search-orders').value.toLowerCase().trim();
   const f = document.getElementById('admin-filter-orders').value;
   let items = remoteOrders.map(r => ({ ...r, _status: r['Статус'] || 'pending' }));
-  if (q) items = items.filter(r => (r['Имя']||'').toLowerCase().includes(q) || (r['Станция']||'').toLowerCase().includes(q));
+  if (q) items = items.filter(r => String(r['Имя']||'').toLowerCase().includes(q) || String(r['Станция']||'').toLowerCase().includes(q));
   if (f !== 'all') items = items.filter(r => r._status === f);
   if (!items.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Заявок нет</div>'; return; }
   list.innerHTML = items.slice().reverse().map(o => {
     const cls = o._status === 'approved' ? 'approved' : o._status === 'rejected' ? 'rejected' : '';
-    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[o._status] || o._status;
-    const btn = o._status === 'pending' ? `
-      <button class="order-btn btn-approve" onclick="changeStatus(${o._row},'approved')">✅ Одобрить</button>
-      <button class="order-btn btn-reject" onclick="changeStatus(${o._row},'rejected')">❌ Отклонить</button>` : '';
+    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[o._status] || escapeHtml(o._status);
+    const row = Number(o._row);
+    const btn = (o._status === 'pending' && Number.isFinite(row)) ? `
+      <button class="order-btn btn-approve" onclick="changeStatus(${row},'approved')">✅ Одобрить</button>
+      <button class="order-btn btn-reject" onclick="changeStatus(${row},'rejected')">❌ Отклонить</button>` : '';
+    const itemsHtml = String(o['Товары'] || '').split('; ').map(s => escapeHtml(s)).join('<br>');
+    const discount = Number(o['Скидка']) > 0 ? `<strong>Скидка: ${Number(o['Скидка'])}%</strong><br>` : '';
     return `<div class="order-card ${cls}">
       <div class="order-actions">${btn}</div>
-      <h4>${o['Дата'] || ''}</h4>
-      <p><strong>Клиент:</strong> ${o['Имя'] || ''}</p>
-      <p><strong>Точка:</strong> ${o['Станция'] || ''}</p>
-      <p><strong>Время:</strong> ${o['Время'] || ''}</p>
+      <h4>${escapeHtml(o['Дата'])}</h4>
+      <p><strong>Клиент:</strong> ${escapeHtml(o['Имя'])}</p>
+      <p><strong>Точка:</strong> ${escapeHtml(o['Станция'])}</p>
+      <p><strong>Время:</strong> ${escapeHtml(o['Время'])}</p>
       <p><strong>Статус:</strong> ${txt}</p>
       <div class="order-items">
-        ${String(o['Товары'] || '').replace(/; /g, '<br>')}
+        ${itemsHtml}
         <br><br>
-        ${Number(o['Скидка']) > 0 ? `<strong>Скидка: ${o['Скидка']}%</strong><br>` : ''}
-        <strong style="color:var(--purple-light);font-size:16px;">Итого: ${o['Итого'] || ''} руб.</strong>
+        ${discount}
+        <strong style="color:var(--purple-light);font-size:16px;">Итого: ${escapeHtml(o['Итого'])} руб.</strong>
       </div>
     </div>`;
   }).join('');
@@ -981,74 +1118,113 @@ async function renderAdminOrders() {
 async function changeStatus(row, status) {
   try {
     await fetch(sheetsUrl(), {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'status', row: row, status: status })
     });
     toast(status === 'approved' ? 'Заказ одобрен' : 'Заказ отклонён', 'success');
   } catch (e) { console.log(e); }
 
-  const o = remoteOrders.find(r => r._row === row);
+  // При отклонении — вернуть остатки
+  if (status === 'rejected') {
+    const o = remoteOrders.find(r => Number(r._row) === Number(row));
+    if (o && o['Товары']) {
+      const itemsStr = String(o['Товары']);
+      const changes = [];
+      itemsStr.split('; ').forEach(part => {
+        const m = part.match(/^(.+) x(\d+)$/);
+        if (m) {
+          const p = products.find(x => x.name === m[1].trim());
+          if (p) changes.push({ id: p.id, delta: Number(m[2]) });
+        }
+      });
+      if (changes.length) await submitStockChanges(changes);
+    }
+  }
+
+  const o = remoteOrders.find(r => Number(r._row) === Number(row));
   if (o && o['TelegramID']) {
     const chat = String(o['TelegramID']).trim();
     if (/^\d+$/.test(chat)) {
       let text;
       if (status === 'approved') {
-        text = `✅ *Ваш заказ подтверждён!*\n\n📍 Точка: ${o['Станция'] || ''}\n⏰ Время: ${o['Время'] || ''}\n\n💰 Итого: ${o['Итого'] || ''} руб.\n\nЖдём вас!`;
+        text = `✅ *Ваш заказ подтверждён!*\n\n📍 Точка: ${escapeMd(o['Станция'] || '')}\n⏰ Время: ${escapeMd(o['Время'] || '')}\n\n💰 Итого: ${escapeMd(o['Итого'] || '')} руб.\n\nЖдём вас!`;
       } else {
-        text = `❌ *Ваш заказ отклонён.*\n\n📍 Точка: ${o['Станция'] || ''}\n⏰ Время: ${o['Время'] || ''}\n\nСвяжитесь с нами для уточнения.`;
+        text = `❌ *Ваш заказ отклонён.*\n\n📍 Точка: ${escapeMd(o['Станция'] || '')}\n⏰ Время: ${escapeMd(o['Время'] || '')}\n\nСвяжитесь с нами для уточнения.`;
       }
-      const res = await tgSend(chat, text);
-      if (!res.ok) toast('Бот не смог написать покупателю. Пусть нажмёт Start.', 'error');
+      await tgSend(chat, text);
     }
   }
-
-  setTimeout(renderAdminOrders, 1500);
+  setTimeout(() => renderAdminOrders(), 1500);
 }
 
+/* ===== АДМИН: ТОВАРЫ ===== */
 function renderAdminTable() {
   const tbody = document.querySelector('#admin-table tbody');
   tbody.innerHTML = products.map(p => {
-    const thumb = p.photo ? `<img src="${p.photo}" class="thumb">` : `<div class="thumb-empty">${p.icon}</div>`;
-    const stock = p.stock === undefined ? (p.inStock ? 1 : 0) : p.stock;
+    const safePhoto = (typeof p.photo === 'string' && /^(https?:|data:image\/)/.test(p.photo)) ? p.photo : '';
+    const thumb = safePhoto ? `<img src="${escapeHtml(safePhoto)}" class="thumb" alt="">` : `<div class="thumb-empty">${escapeHtml(p.icon)}</div>`;
+    const stock = getStock(p);
+    const id = Number(p.id);
     return `<tr>
       <td><div class="photo-upload">
         ${thumb}
-        <label for="photo-${p.id}">📷</label>
-        <input type="file" id="photo-${p.id}" accept="image/*" onchange="setProductPhoto(${p.id},this)">
-        ${p.photo ? `<button class="clear-photo" onclick="clearProductPhoto(${p.id})">✕</button>` : ''}
+        <label for="photo-${id}">📷</label>
+        <input type="file" id="photo-${id}" accept="image/*" onchange="setProductPhoto(${id},this)">
+        ${safePhoto ? `<button class="clear-photo" onclick="clearProductPhoto(${id})">✕</button>` : ''}
       </div></td>
-      <td><input type="text" value="${p.icon}" onchange="editProd(${p.id},'icon',this.value)" style="text-align:center;"></td>
-      <td><input type="text" value="${p.name.replace(/"/g,'&quot;')}" onchange="editProd(${p.id},'name',this.value)"></td>
-      <td><input type="number" value="${p.price}" onchange="editProd(${p.id},'price',this.value)"></td>
-      <td><input type="number" value="${stock}" min="0" onchange="editProd(${p.id},'stock',this.value)"></td>
-      <td><select onchange="editProd(${p.id},'category',this.value)">
+      <td><input type="text" value="${escapeHtml(p.icon)}" onchange="editProd(${id},'icon',this.value)" style="text-align:center;"></td>
+      <td><input type="text" value="${escapeHtml(p.name)}" onchange="editProd(${id},'name',this.value)"></td>
+      <td><input type="number" value="${escapeHtml(p.price)}" onchange="editProd(${id},'price',this.value)"></td>
+      <td><input type="number" value="${stock}" min="0" onchange="editProd(${id},'stock',this.value)"></td>
+      <td><select onchange="editProd(${id},'category',this.value)">
         <option value="liquid" ${p.category==='liquid'?'selected':''}>Жидкость</option>
         <option value="snus" ${p.category==='snus'?'selected':''}>Снюс</option>
         <option value="device" ${p.category==='device'?'selected':''}>Под-система</option>
         <option value="accessory" ${p.category==='accessory'?'selected':''}>Расходник</option>
       </select></td>
-      <td><button class="button" style="background:#ff4d4d;color:#fff;padding:5px 10px;" onclick="deleteProd(${p.id})">Удалить</button></td>
+      <td><button class="button" style="background:#ff4d4d;color:#fff;padding:5px 10px;" onclick="deleteProd(${id})">Удалить</button></td>
     </tr>`;
   }).join('');
 }
 
-function setProductPhoto(id, input) {
+function compressImage(file, maxSize = 800, quality = 0.8) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxSize) { h = h * maxSize / w; w = maxSize; }
+        if (h > maxSize) { w = w * maxSize / h; h = maxSize; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function setProductPhoto(id, input) {
   const file = input.files[0]; if (!file) return;
-  if (file.size > 800*1024) return toast('Файл больше 800 КБ', 'error');
-  const r = new FileReader();
-  r.onload = (ev) => {
+  try {
+    const dataUrl = await compressImage(file);
     const p = products.find(x => x.id === id); if (!p) return;
-    p.photo = ev.target.result; saveProducts(); renderAdminTable(); renderProducts(); toast('Фото обновлено');
-  };
-  r.readAsDataURL(file);
+    p.photo = dataUrl; saveProducts(); renderAdminTable(); renderProducts();
+    await saveProductToServer(p);
+    toast('Фото обновлено');
+  } catch (e) { console.log(e); toast('Ошибка фото', 'error'); }
 }
 function clearProductPhoto(id) {
   const p = products.find(x => x.id === id); if (!p) return;
-  p.photo = ''; saveProducts(); renderAdminTable(); renderProducts(); toast('Фото удалено');
+  p.photo = ''; saveProducts(); renderAdminTable(); renderProducts();
+  saveProductToServer(p);
+  toast('Фото удалено');
 }
-function addNewProduct() {
+async function addNewProduct() {
   const name = document.getElementById('np-name').value.trim();
   const price = parseFloat(document.getElementById('np-price').value);
   const stock = parseInt(document.getElementById('np-stock-count').value, 10);
@@ -1059,36 +1235,33 @@ function addNewProduct() {
   if (!name) return toast('Введи название', 'error');
   if (isNaN(price) || price <= 0) return toast('Введи цену', 'error');
   if (isNaN(stock) || stock < 0) return toast('Введи количество', 'error');
-  const catNames = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' };
   const id = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
-  const finish = (photo) => {
-    products.push({ id, name, price, desc, category, categoryName: catNames[category], icon, stock, inStock: stock > 0, photo: photo || '' });
-    saveProducts(); renderAdminTable(); renderProducts(); toast('Товар добавлен');
-    document.getElementById('np-name').value=''; document.getElementById('np-price').value='';
-    document.getElementById('np-desc').value=''; document.getElementById('np-photo').value='';
-    document.getElementById('np-stock-count').value = '10';
-  };
-  if (file) {
-    if (file.size > 800*1024) return toast('Фото больше 800 КБ', 'error');
-    const r = new FileReader(); r.onload = (e) => finish(e.target.result); r.readAsDataURL(file);
-  } else finish(null);
+  let photo = '';
+  if (file) { try { photo = await compressImage(file); } catch(e) { console.log(e); } }
+  const product = { id, name, price, desc, category, categoryName: CATEGORY_NAMES[category], icon, stock, inStock: stock > 0, photo };
+  products.push(product);
+  saveProducts(); renderAdminTable(); renderProducts();
+  await saveProductToServer(product);
+  toast('Товар добавлен');
+  document.getElementById('np-name').value=''; document.getElementById('np-price').value='';
+  document.getElementById('np-desc').value=''; document.getElementById('np-photo').value='';
+  document.getElementById('np-stock-count').value = '10';
 }
-function editProd(id, field, val) {
+async function editProd(id, field, val) {
   const p = products.find(x => x.id === id); if (!p) return;
   if (field === 'price') p.price = Number(val);
-  else if (field === 'stock') {
-    p.stock = Math.max(0, parseInt(val, 10) || 0);
-    p.inStock = p.stock > 0;
-  }
+  else if (field === 'stock') { p.stock = Math.max(0, parseInt(val, 10) || 0); p.inStock = p.stock > 0; }
   else if (field === 'inStock') p.inStock = val;
   else p[field] = val;
-  if (field === 'category') p.categoryName = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' }[val];
+  if (field === 'category') p.categoryName = CATEGORY_NAMES[val];
   saveProducts(); renderProducts();
+  await saveProductToServer(p);
 }
-function deleteProd(id) {
+async function deleteProd(id) {
   if (!confirm('Удалить?')) return;
   products = products.filter(x => x.id !== id);
   saveProducts(); renderAdminTable(); renderProducts();
+  await deleteProductFromServer(id);
 }
 
 init();
