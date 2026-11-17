@@ -267,8 +267,8 @@ a { color:inherit; text-decoration:none; }
       <label>Ветка метро</label>
       <select id="order-branch">
         <option value="">Выберите...</option>
-        <option value="blue">🔵 Синяя</option>
         <option value="red">🔴 Красная</option>
+        <option value="blue">🔵 Синяя</option>
       </select>
     </div>
     <div class="form-group"><label>Станция</label><select id="order-metro"><option value="">Сначала ветку...</option></select></div>
@@ -341,8 +341,8 @@ a { color:inherit; text-decoration:none; }
         <input type="text" id="set-tg-token" value="8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
       </div>
       <div class="form-group">
-        <label>ID чата:</label>
-        <input type="text" id="set-tg-chat" value="5512515146" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
+        <label>ID чата (через запятую, если несколько):</label>
+        <input type="text" id="set-tg-chat" value="5512515146,-5563023760" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
       </div>
       <button class="button" id="save-tg-settings" style="margin-bottom:30px;">Сохранить настройки</button>
       
@@ -480,8 +480,9 @@ const DEFAULT_REVIEWS = [
   { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный, всегда в наличии.", stars:4 }
 ];
 
+// ВЕТКИ МЕТРО: red = Красная, blue = Синяя. Порядок станций — как на реальной схеме.
 const METRO = {
-  red: ["Малиновка","Петровщина","Михалово","Грушевка","Площадь Франтишка Богушевича","Институт Культуры","Площадь Ленина","Октябрьская","Площадь Победы","Парк Челюскинцев","Академия Наук","Площадь Якуба Коласа","Восток","Борисовский тракт","Уручье"],
+  red: ["Уручье","Борисовский тракт","Восток","Площадь Якуба Коласа","Академия Наук","Парк Челюскинцев","Площадь Победы","Октябрьская","Площадь Ленина","Институт Культуры","Площадь Франтишка Богушевича","Грушевка","Михалово","Петровщина","Малиновка"],
   blue: ["Каменная Горка","Кунцевщина","Спортивная","Молодежная","Фрунзенская","Немига","Купаловская","Октябрьская","Площадь Ленина","Первомайская","Пролетарская","Тракторный завод","Партизанская","Автозаводская","Могилевская","Шабаны"]
 };
 
@@ -527,9 +528,8 @@ function init() {
     document.body.classList.remove('locked');
   }
 
-  // Значения по умолчанию для Telegram
   if (!localStorage.getItem(KEY_TG_TOKEN)) localStorage.setItem(KEY_TG_TOKEN, '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U');
-  if (!localStorage.getItem(KEY_TG_CHAT)) localStorage.setItem(KEY_TG_CHAT, '5512515146');
+  if (!localStorage.getItem(KEY_TG_CHAT)) localStorage.setItem(KEY_TG_CHAT, '5512515146,-5563023760');
 
   renderProducts();
   renderReviews();
@@ -843,20 +843,22 @@ async function submitOrder() {
   save(KEY_ORDERS, orders);
 
   const tgToken = localStorage.getItem(KEY_TG_TOKEN);
-  const tgChat = localStorage.getItem(KEY_TG_CHAT);
-  if (tgToken && tgChat) {
+  const tgChats = (localStorage.getItem(KEY_TG_CHAT) || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (tgToken && tgChats.length) {
     let tgText = `🚀 *Новая заявка!*\n\n👤 Клиент: ${newOrder.name}\n🚇 Метро: ${newOrder.branch}, ст. ${newOrder.metro}\n⏰ Время: ${newOrder.time}\n\n🛒 *Заказ:*\n`;
     newOrder.items.forEach(i => { tgText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
     if (newOrder.discount > 0) tgText += `\n🎁 Скидка: ${newOrder.discount}%`;
     tgText += `\n💰 *Итого: ${newOrder.total} руб.*`;
 
-    try {
-      await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: tgChat, text: tgText, parse_mode: 'Markdown' })
-      });
-    } catch (e) { console.log('Ошибка ТГ:', e); }
+    for (const chat of tgChats) {
+      try {
+        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chat, text: tgText, parse_mode: 'Markdown' })
+        });
+      } catch (e) { console.log('Ошибка ТГ для', chat, e); }
+    }
   }
 
   cart = [];
