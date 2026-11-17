@@ -896,7 +896,7 @@ async function submitOrder() {
     let buyerText = `✅ *Заказ принят!*\n\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Состав:*\n`;
     order.items.forEach(i => { buyerText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
     if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
-    buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения.`;
+    buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения,по вопросам @nekati_n`;
     const res = await tgSend(buyerChat, buyerText);
     if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у @Tuman_corner_bot.', 'error');
   }
