@@ -102,9 +102,6 @@ a { color:inherit; text-decoration:none; }
 .my-order-card { background:var(--bg); border:1px solid var(--border); padding:15px; border-radius:10px; margin-bottom:15px; border-left:5px solid #ffd700; }
 .my-order-card.approved { border-left-color:#4ade80; }
 .my-order-card.rejected { border-left-color:#ff4d4d; opacity:0.7; }
-.admin-msg { margin-top:10px; padding:10px; border-radius:8px; font-size:13px; }
-.admin-msg.reject { background:rgba(255,77,77,0.1); color:#ff4d4d; border:1px solid rgba(255,77,77,0.3); }
-.admin-msg.approve { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.3); }
 
 .age-gate { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(8,4,14,.98); }
 .age-gate.hidden { display:none; }
@@ -132,11 +129,9 @@ a { color:inherit; text-decoration:none; }
 .order-card.approved { border-left-color:#4ade80; }
 .order-card.rejected { border-left-color:#ff4d4d; opacity:.7; }
 .order-actions { position:absolute; top:15px; right:15px; display:flex; gap:5px; flex-wrap:wrap; }
-.order-btn { padding:5px 10px; border:none; border-radius:4px; color:#fff; font-size:12px; font-weight:bold; }
-.btn-copy { background:#3b82f6; } .btn-approve { background:#4ade80; color:#000; } .btn-reject { background:#ff4d4d; } .btn-delete { background:#6b7280; }
+.order-btn { padding:5px 10px; border:none; border-radius:4px; color:#fff; font-size:12px; font-weight:bold; cursor:pointer; }
+.btn-approve { background:#4ade80; color:#000; } .btn-reject { background:#ff4d4d; }
 .order-items { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); font-size:13px; }
-.admin-msg-input { width:100%; padding:10px; margin-top:10px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:8px; resize:vertical; font-size:13px; }
-.btn-save-msg { background:var(--purple); color:#000; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:12px; margin-top:5px; cursor:pointer; }
 
 .thumb { width:44px; height:44px; border-radius:8px; object-fit:cover; border:1px solid var(--border); background:var(--bg); display:block; }
 .thumb-empty { width:44px; height:44px; border-radius:8px; border:1px dashed var(--border); display:grid; place-items:center; color:var(--muted); font-size:18px; background:var(--bg); }
@@ -274,6 +269,11 @@ a { color:inherit; text-decoration:none; }
     </div>
     <div class="form-group"><label>Имя или ник</label><input type="text" id="order-name" placeholder="Алексей (@alex)"></div>
     <div class="form-group">
+      <label>Ваш Telegram ID (для уведомлений)</label>
+      <input type="text" id="order-tg" placeholder="Например, 123456789 — узнать у @userinfobot" inputmode="numeric">
+      <p style="font-size:12px;color:var(--muted);margin:5px 0 0;">Необязательно. Если указать — бот пришлёт подтверждение и статус заказа. Важно: нажмите Start у @Tuman_corner_bot.</p>
+    </div>
+    <div class="form-group">
       <label>Точка выдачи</label>
       <select id="order-point">
         <option value="">Выберите...</option>
@@ -288,7 +288,7 @@ a { color:inherit; text-decoration:none; }
       <select id="order-time-select"><option value="">Сначала выберите точку...</option></select>
       <div style="display:none; margin-top:8px;" id="order-time-custom-wrap">
         <input type="time" id="order-time-custom" min="08:00" max="22:40">
-        <p style="font-size:12px;color:var(--muted);margin:5px 0 0;">Выходной день — можно любое время до 22:40.</p>
+        <p style="font-size:12px;color:var(--muted);margin:5px 0 0;">Выходной — можно любое время до 22:40.</p>
       </div>
     </div>
     <div class="form-group">
@@ -297,7 +297,7 @@ a { color:inherit; text-decoration:none; }
         <input type="text" id="order-promo" placeholder="Введите код...">
         <button type="button" class="button button-secondary" id="apply-promo">ОК</button>
       </div>
-      <div id="promo-success" style="color:#4ade80;font-size:12px;margin-top:5px;display:none;">✅ Промокод применён!</div>
+      <div id="promo-success" style="color:#4ade80;font-size:12px;margin-top:5px;display:none;"></div>
       <div id="promo-error" style="color:#ff4d4d;font-size:12px;margin-top:5px;display:none;">❌ Неверный код</div>
     </div>
     <div class="discount-row" id="discount-row"><span>Скидка (<span id="discount-percent">0</span>%):</span><span id="discount-amount">-0 руб.</span></div>
@@ -312,7 +312,6 @@ a { color:inherit; text-decoration:none; }
       <h2 style="margin:0;">Ваши заявки</h2>
       <button class="icon-button" id="close-my-orders">✕</button>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:15px;">Статус вашей заявки обновится здесь, как только админ её проверит.</p>
     <div id="my-orders-list"></div>
   </div>
 </div>
@@ -324,21 +323,20 @@ a { color:inherit; text-decoration:none; }
       <button class="icon-button" id="close-admin">✕</button>
     </div>
     <div class="admin-tabs">
-      <button class="tab-btn active" data-tab="orders">📋 Заявки (<span id="orders-count">0</span>)</button>
+      <button class="tab-btn active" data-tab="orders">📋 Заявки</button>
       <button class="tab-btn" data-tab="products">📦 Товары</button>
-      <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
     </div>
 
     <div id="tab-orders" class="tab-content">
       <div class="orders-controls">
-        <input type="text" class="orders-search" id="admin-search-orders" placeholder="Поиск по имени/метро...">
+        <input type="text" class="orders-search" id="admin-search-orders" placeholder="Поиск по имени/точке...">
         <select class="orders-search" id="admin-filter-orders" style="flex:0 0 150px;">
           <option value="all">Все</option>
           <option value="pending">Ожидают</option>
           <option value="approved">Одобрены</option>
           <option value="rejected">Отклонены</option>
         </select>
-        <button class="button" id="export-csv">📥 CSV</button>
+        <button class="button" id="refresh-orders">🔄 Обновить</button>
       </div>
       <div class="orders-list" id="orders-list"></div>
     </div>
@@ -371,41 +369,13 @@ a { color:inherit; text-decoration:none; }
           <option value="accessory">Расходник</option>
         </select>
         <input type="text" id="np-icon" placeholder="Иконка (эмодзи)" value="📦">
-        <input type="text" id="np-desc" placeholder="Краткое описание (например, 🫐🍒)" value="">
+        <input type="text" id="np-desc" placeholder="Краткое описание" value="">
         <label class="full" style="display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px;">
           <input type="checkbox" id="np-stock" checked style="width:auto;"> В наличии
         </label>
         <input type="file" id="np-photo" accept="image/*" class="full">
         <button class="button" id="add-product-btn">Добавить товар</button>
       </div>
-    </div>
-
-    <div id="tab-settings" class="tab-content" style="display:none;">
-      <h3 style="margin-bottom:15px;">Настройки Telegram-бота</h3>
-      <div class="form-group">
-        <label>Токен бота:</label>
-        <input type="text" id="set-tg-token" value="8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
-      </div>
-      <div class="form-group">
-        <label>ID чата (через запятую):</label>
-        <input type="text" id="set-tg-chat" value="5512515146,8570615330,8736479925" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
-      </div>
-      <div class="form-group">
-        <label>URL Google Таблицы (Apps Script):</label>
-        <input type="text" id="set-sheets-url" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
-      </div>
-      <button class="button" id="save-tg-settings" style="margin-bottom:30px;">Сохранить настройки</button>
-      
-      <h3 style="margin-bottom:15px;">Оформление</h3>
-      <div class="form-group">
-        <label>Цвет фона:</label>
-        <input type="color" id="bg-color" value="#10091b" style="width:60px;height:40px;padding:0;">
-      </div>
-      <div class="form-group">
-        <label>Фоновое изображение:</label>
-        <input type="file" id="bg-image" accept="image/*">
-      </div>
-      <button class="button button-secondary" id="reset-bg">Сбросить фон</button>
     </div>
   </div>
 </div>
@@ -415,20 +385,27 @@ a { color:inherit; text-decoration:none; }
 <script>
 "use strict";
 
+// ================== НАСТРОЙКА ==================
+const SHEETS_URL_HARDCODED = 'https://script.google.com/macros/s/AKfycbxPVCgPIHgYM94zqDUUxX4PIXn5SI8I2er970Df4vhwKug0za-08EdJbBCtjiCyEn60/exec';
+const TG_TOKEN = '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U';
+const TG_ADMIN_CHATS = ['5512515146','8570615330','8736479925'];
+const ADMIN_PASSWORD = 'Skitolss';
+// ===============================================
+
 const KEY_PRODUCTS = 'tuman_products_v6';
 const KEY_CART = 'tuman_cart_v5';
-const KEY_ORDERS = 'tuman_orders_v5';
-const KEY_REVIEWS = 'tuman_reviews_v5';
 const KEY_FAVORITES = 'tuman_favorites_v5';
 const KEY_THEME = 'tuman_theme_v5';
 const KEY_AGE = 'tuman_age_v5';
-const KEY_BG = 'tuman_bg_v5';
-const KEY_BG_IMG = 'tuman_bg_img_v5';
-const KEY_TG_TOKEN = 'tuman_tg_token';
-const KEY_TG_CHAT = 'tuman_tg_chat';
-const KEY_SHEETS_URL = 'tuman_sheets_url';
-const KEY_HALYAVA_COUNT = 'tuman_promo_halyava';
-const ADMIN_PASSWORD = 'Skitolss';
+const KEY_HALYAVA = 'tuman_promo_halyava';
+
+const PICKUP_POINTS = {
+  "Партизанская ст.м": ["16:30","18:00","21:00"],
+  "Могилёвская ст.м": ["17:00","18:30","20:30"],
+  "Слуцкий гостинец ст.м": ["17:30","19:30","20:00"],
+  "Площадь Ленина": ["19:00","20:30","21:30"]
+};
+const MAX_TIME = "22:40";
 
 const DEFAULT_PRODUCTS = [
   { id:1, name:"Annima Love 50mg — Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", inStock:true, photo:"" },
@@ -527,36 +504,30 @@ const DEFAULT_PRODUCTS = [
 ];
 
 const DEFAULT_REVIEWS = [
-  { id:1, name:"Алексей", avatar:"А", text:"Заказал на пробу пару вкусов. Доставили на следующий день к метро. Вкусы пушка, продавец вежливый!", stars:5 },
-  { id:2, name:"Марина", avatar:"М", text:"Очень удобный сайт, все понятно по вкусам. Заказала Xros mini, быстро договорились о встрече.", stars:5 },
-  { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный, всегда в наличии.", stars:4 }
+  { id:1, name:"Алексей", avatar:"А", text:"Заказал на пробу пару вкусов. Доставили на следующий день к метро.", stars:5 },
+  { id:2, name:"Марина", avatar:"М", text:"Очень удобный сайт. Заказала Xros mini, быстро договорились.", stars:5 },
+  { id:3, name:"Дмитрий", avatar:"Д", text:"Беру снюс только тут. Ассортимент огромный.", stars:4 }
 ];
 
-const PICKUP_POINTS = {
-  "Партизанская ст.м": ["16:30","18:00","21:00"],
-  "Могилёвская ст.м": ["17:00","18:30","20:30"],
-  "Слуцкий гостинец ст.м": ["17:30","19:30","20:00"],
-  "Площадь Ленина": ["19:00","20:30","21:30"]
-};
-const MAX_ORDER_TIME = "22:40";
-const PROMO_KURA_PERCENT = 10;
-const PROMO_HALYAVA_PERCENT = 0.05;
-const PROMO_HALYAVA_LIMIT = 5;
-
-let products = [];
-let cart = [];
-let orders = [];
-let reviews = [];
-let favorites = [];
+let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
+let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
+let favorites = JSON.parse(localStorage.getItem(KEY_FAVORITES) || '[]');
+let reviews = DEFAULT_REVIEWS;
+let remoteOrders = [];
 let activeFilter = 'all';
 let showOnlyFavorites = false;
 let currentDiscount = 0;
 let currentDiscountLabel = '';
 let isAdminAuth = false;
 
-function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
-function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.error(e); } }
-function showToast(msg, type) {
+function saveProducts() { localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products)); }
+function saveCart() { localStorage.setItem(KEY_CART, JSON.stringify(cart)); }
+function saveFavorites() { localStorage.setItem(KEY_FAVORITES, JSON.stringify(favorites)); }
+function sheetsUrl() { return SHEETS_URL_HARDCODED; }
+function isWeekend() { const d = new Date().getDay(); return d === 0 || d === 6; }
+function halyavaCount() { return Number(localStorage.getItem(KEY_HALYAVA) || '0'); }
+
+function toast(msg, type) {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
   t.className = 'toast';
@@ -566,44 +537,29 @@ function showToast(msg, type) {
   setTimeout(() => t.remove(), 3000);
 }
 
-function isWeekend(date) {
-  const d = (date || new Date()).getDay();
-  return d === 0 || d === 6;
-}
-function getHalyavaCount() {
-  return Number(localStorage.getItem(KEY_HALYAVA_COUNT) || '0');
-}
-function incHalyavaCount() {
-  localStorage.setItem(KEY_HALYAVA_COUNT, String(getHalyavaCount() + 1));
+async function tgSend(chat, text) {
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown' })
+    });
+    return await r.json();
+  } catch (e) { return { ok: false, error: String(e) }; }
 }
 
 function init() {
-  products = load(KEY_PRODUCTS, DEFAULT_PRODUCTS);
-  cart = load(KEY_CART, []);
-  orders = load(KEY_ORDERS, []);
-  reviews = load(KEY_REVIEWS, DEFAULT_REVIEWS);
-  favorites = load(KEY_FAVORITES, []);
-
   if (localStorage.getItem(KEY_THEME) === 'light') {
     document.body.classList.add('light-theme');
     document.getElementById('theme-toggle').textContent = '☀️';
   }
-  const bg = localStorage.getItem(KEY_BG);
-  if (bg) document.documentElement.style.setProperty('--bg', bg);
-  const bgImg = localStorage.getItem(KEY_BG_IMG);
-  if (bgImg) document.body.style.backgroundImage = `url(${bgImg})`;
   if (localStorage.getItem(KEY_AGE) === 'true') {
     document.getElementById('age-gate').classList.add('hidden');
     document.body.classList.remove('locked');
   }
-
-  if (!localStorage.getItem(KEY_TG_TOKEN)) localStorage.setItem(KEY_TG_TOKEN, '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U');
-  if (!localStorage.getItem(KEY_TG_CHAT)) localStorage.setItem(KEY_TG_CHAT, '5512515146,8570615330,8736479925');
-
   renderProducts();
   renderReviews();
   renderCart();
-  updateOrdersCount();
   attachEvents();
 }
 
@@ -619,9 +575,9 @@ function attachEvents() {
   };
   document.getElementById('theme-toggle').onclick = () => {
     document.body.classList.toggle('light-theme');
-    const isLight = document.body.classList.contains('light-theme');
-    document.getElementById('theme-toggle').textContent = isLight ? '☀️' : '🌙';
-    localStorage.setItem(KEY_THEME, isLight ? 'light' : 'dark');
+    const l = document.body.classList.contains('light-theme');
+    document.getElementById('theme-toggle').textContent = l ? '☀️' : '🌙';
+    localStorage.setItem(KEY_THEME, l ? 'light' : 'dark');
   };
   document.getElementById('open-cart').onclick = () => {
     document.getElementById('cart-panel').classList.add('open');
@@ -632,14 +588,12 @@ function attachEvents() {
     document.getElementById('backdrop').classList.remove('open');
   };
   document.getElementById('backdrop').onclick = () => {
-    document.querySelectorAll('.cart-panel, .checkout-modal, .my-orders-modal').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.cart-panel,.checkout-modal,.my-orders-modal').forEach(el => el.classList.remove('open'));
     document.getElementById('backdrop').classList.remove('open');
   };
-  document.getElementById('clear-cart').onclick = () => {
-    if (confirm('Очистить корзину?')) { cart = []; save(KEY_CART, cart); renderCart(); }
-  };
+  document.getElementById('clear-cart').onclick = () => { if (confirm('Очистить?')) { cart = []; saveCart(); renderCart(); } };
   document.getElementById('open-checkout').onclick = () => {
-    if (cart.length === 0) { showToast('Корзина пуста!', 'error'); return; }
+    if (!cart.length) return toast('Корзина пуста', 'error');
     document.querySelectorAll('.cart-panel').forEach(el => el.classList.remove('open'));
     updateCheckoutTotal();
     document.getElementById('checkout-modal').classList.add('open');
@@ -658,26 +612,15 @@ function attachEvents() {
     document.getElementById('backdrop').classList.remove('open');
   };
   document.getElementById('order-point').onchange = (e) => {
-    const point = e.target.value;
+    const p = e.target.value;
     const sel = document.getElementById('order-time-select');
-    const customWrap = document.getElementById('order-time-custom-wrap');
+    const wrap = document.getElementById('order-time-custom-wrap');
     sel.innerHTML = '<option value="">Выберите...</option>';
-    if (!point) {
-      sel.innerHTML = '<option value="">Сначала выберите точку...</option>';
-      customWrap.style.display = 'none';
-      return;
-    }
-    if (isWeekend()) {
-      sel.style.display = 'none';
-      customWrap.style.display = 'block';
-    } else {
-      sel.style.display = 'block';
-      customWrap.style.display = 'none';
-      (PICKUP_POINTS[point] || []).forEach(t => {
-        const o = document.createElement('option');
-        o.value = t; o.textContent = t;
-        sel.appendChild(o);
-      });
+    if (!p) { sel.innerHTML = '<option value="">Сначала точку...</option>'; wrap.style.display = 'none'; return; }
+    if (isWeekend()) { sel.style.display = 'none'; wrap.style.display = 'block'; }
+    else {
+      sel.style.display = 'block'; wrap.style.display = 'none';
+      (PICKUP_POINTS[p] || []).forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o); });
     }
   };
   document.getElementById('apply-promo').onclick = () => {
@@ -685,25 +628,20 @@ function attachEvents() {
     const s = document.getElementById('promo-success');
     const e = document.getElementById('promo-error');
     const d = document.getElementById('discount-row');
-    const pctEl = document.getElementById('discount-percent');
+    const pct = document.getElementById('discount-percent');
     if (code.toLowerCase() === 'kura-10') {
-      currentDiscount = PROMO_KURA_PERCENT;
-      currentDiscountLabel = 'kura-10';
-      s.textContent = '✅ Промокод kura-10 применён (10%)';
-      s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
-      pctEl.textContent = PROMO_KURA_PERCENT;
+      currentDiscount = 10; currentDiscountLabel = 'kura-10';
+      s.textContent = '✅ kura-10: скидка 10%'; s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
+      pct.textContent = '10';
     } else if (code.toUpperCase() === 'ХАЛЯВА') {
-      if (getHalyavaCount() >= PROMO_HALYAVA_LIMIT) {
+      if (halyavaCount() >= 5) {
         currentDiscount = 0; currentDiscountLabel = '';
         s.style.display = 'none'; e.style.display = 'block'; d.style.display = 'none';
-        e.textContent = '❌ Код ХАЛЯВА исчерпан (5 из 5)';
-        return;
+        e.textContent = '❌ ХАЛЯВА исчерпана (5/5)'; return;
       }
-      currentDiscount = PROMO_HALYAVA_PERCENT;
-      currentDiscountLabel = 'ХАЛЯВА';
-      s.textContent = '✅ Промокод ХАЛЯВА применён (0.05%)';
-      s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
-      pctEl.textContent = PROMO_HALYAVA_PERCENT;
+      currentDiscount = 0.05; currentDiscountLabel = 'ХАЛЯВА';
+      s.textContent = '✅ ХАЛЯВА: скидка 0.05%'; s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
+      pct.textContent = '0.05';
     } else {
       currentDiscount = 0; currentDiscountLabel = '';
       s.style.display = 'none'; e.style.display = 'block'; d.style.display = 'none';
@@ -724,25 +662,20 @@ function attachEvents() {
   };
   document.getElementById('show-favorites').onclick = () => {
     showOnlyFavorites = !showOnlyFavorites;
-    showToast(showOnlyFavorites ? 'Показаны избранные' : 'Показаны все');
+    toast(showOnlyFavorites ? 'Избранное' : 'Все товары');
     renderProducts();
   };
   document.getElementById('secret-btn').onclick = () => {
     if (!isAdminAuth) {
-      const pass = prompt('Пароль админки:');
+      const pass = prompt('Пароль:');
       if (pass === ADMIN_PASSWORD) isAdminAuth = true;
-      else { showToast('Неверный пароль', 'error'); return; }
+      else return toast('Неверный пароль', 'error');
     }
     document.getElementById('admin-modal').classList.add('open');
     renderAdminTable();
     renderAdminOrders();
-    document.getElementById('set-tg-token').value = localStorage.getItem(KEY_TG_TOKEN) || '';
-    document.getElementById('set-tg-chat').value = localStorage.getItem(KEY_TG_CHAT) || '';
-    document.getElementById('set-sheets-url').value = localStorage.getItem(KEY_SHEETS_URL) || '';
   };
-  document.getElementById('close-admin').onclick = () => {
-    document.getElementById('admin-modal').classList.remove('open');
-  };
+  document.getElementById('close-admin').onclick = () => document.getElementById('admin-modal').classList.remove('open');
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -755,79 +688,46 @@ function attachEvents() {
   });
   document.getElementById('admin-search-orders').oninput = renderAdminOrders;
   document.getElementById('admin-filter-orders').onchange = renderAdminOrders;
-  document.getElementById('export-csv').onclick = exportCSV;
-  document.getElementById('save-tg-settings').onclick = () => {
-    localStorage.setItem(KEY_TG_TOKEN, document.getElementById('set-tg-token').value.trim());
-    localStorage.setItem(KEY_TG_CHAT, document.getElementById('set-tg-chat').value.trim());
-    localStorage.setItem(KEY_SHEETS_URL, document.getElementById('set-sheets-url').value.trim());
-    showToast('Настройки сохранены');
-  };
-  document.getElementById('bg-color').oninput = (e) => {
-    document.documentElement.style.setProperty('--bg', e.target.value);
-    localStorage.setItem(KEY_BG, e.target.value);
-  };
-  document.getElementById('bg-image').onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const r = new FileReader();
-    r.onload = (ev) => {
-      document.body.style.backgroundImage = `url(${ev.target.result})`;
-      localStorage.setItem(KEY_BG_IMG, ev.target.result);
-    };
-    r.readAsDataURL(file);
-  };
-  document.getElementById('reset-bg').onclick = () => {
-    document.documentElement.style.setProperty('--bg', '#10091b');
-    document.body.style.backgroundImage = 'none';
-    localStorage.removeItem(KEY_BG);
-    localStorage.removeItem(KEY_BG_IMG);
-    document.getElementById('bg-color').value = '#10091b';
-  };
+  document.getElementById('refresh-orders').onclick = renderAdminOrders;
   document.getElementById('add-product-btn').onclick = addNewProduct;
 }
 
 function renderProducts() {
   const grid = document.getElementById('product-grid');
-  const search = document.getElementById('search').value.toLowerCase().trim();
-  const sortMode = document.getElementById('sort').value;
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const sort = document.getElementById('sort').value;
   let list = products.filter(p => {
-    if (search && !p.name.toLowerCase().includes(search) && !p.desc.toLowerCase().includes(search)) return false;
+    if (q && !p.name.toLowerCase().includes(q) && !p.desc.toLowerCase().includes(q)) return false;
     if (activeFilter !== 'all' && p.category !== activeFilter) return false;
     if (showOnlyFavorites && !favorites.includes(p.id)) return false;
     return true;
   });
-  if (sortMode === 'price-asc') list.sort((a,b) => a.price - b.price);
-  if (sortMode === 'price-desc') list.sort((a,b) => b.price - a.price);
-  if (sortMode === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
-  if (list.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Ничего не найдено</div>';
-    return;
-  }
+  if (sort === 'price-asc') list.sort((a,b) => a.price - b.price);
+  if (sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+  if (sort === 'name') list.sort((a,b) => a.name.localeCompare(b.name));
+  if (!list.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Ничего не найдено</div>'; return; }
   grid.innerHTML = list.map(p => {
-    const isFav = favorites.includes(p.id);
-    const art = p.photo ? `<img src="${p.photo}" alt="${p.name}">` : `<div class="product-icon">${p.icon}</div>`;
-    return `
-      <article class="product-card ${p.inStock === false ? 'out-of-stock' : ''}">
-        <span class="product-tag">${p.categoryName}</span>
-        ${p.inStock === false ? '<span class="out-of-stock-badge">Нет в наличии</span>' : ''}
-        <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleFav(${p.id})">${isFav ? '❤️' : '🤍'}</button>
-        <div class="product-art">${art}</div>
-        <div class="product-body">
-          <h3>${p.name}</h3>
-          <p>${p.desc}</p>
-          <div class="product-bottom">
-            <span class="price">${p.price} руб.</span>
-            <button class="button add-button" onclick="addToCart(${p.id})" ${p.inStock === false ? 'disabled' : ''}>В корзину</button>
-          </div>
+    const fav = favorites.includes(p.id);
+    const art = p.photo ? `<img src="${p.photo}" alt="">` : `<div class="product-icon">${p.icon}</div>`;
+    return `<article class="product-card ${p.inStock === false ? 'out-of-stock' : ''}">
+      <span class="product-tag">${p.categoryName}</span>
+      ${p.inStock === false ? '<span class="out-of-stock-badge">Нет в наличии</span>' : ''}
+      <button class="favorite-btn ${fav ? 'active' : ''}" onclick="toggleFav(${p.id})">${fav ? '❤️' : '🤍'}</button>
+      <div class="product-art">${art}</div>
+      <div class="product-body">
+        <h3>${p.name}</h3>
+        <p>${p.desc}</p>
+        <div class="product-bottom">
+          <span class="price">${p.price} руб.</span>
+          <button class="button add-button" onclick="addToCart(${p.id})" ${p.inStock === false ? 'disabled' : ''}>В корзину</button>
         </div>
-      </article>
-    `;
+      </div>
+    </article>`;
   }).join('');
 }
 
 function renderReviews() {
-  const grid = document.getElementById('reviews-grid');
-  grid.innerHTML = reviews.map(r => `
+  document.getElementById('reviews-grid').innerHTML = reviews.map(r => `
     <div class="review-card">
       <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
       <p class="review-text">"${r.text}"</p>
@@ -839,94 +739,76 @@ function renderReviews() {
 function renderCart() {
   const list = document.getElementById('cart-list');
   let total = 0, count = 0;
-  if (cart.length === 0) {
-    list.innerHTML = '<li style="color:var(--muted);justify-content:center;">Корзина пуста</li>';
-  } else {
+  if (!cart.length) list.innerHTML = '<li style="color:var(--muted);justify-content:center;">Корзина пуста</li>';
+  else {
     list.innerHTML = cart.map(item => {
       const p = products.find(x => x.id === item.id);
       if (!p) return '';
-      total += p.price * item.qty;
-      count += item.qty;
-      return `
-        <li>
-          <div class="cart-item-info">
-            <div class="cart-item-name">${p.name}</div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="changeQty(${p.id},-1)">−</button>
-              <span class="qty-val">${item.qty}</span>
-              <button class="qty-btn" onclick="changeQty(${p.id},1)">+</button>
-            </div>
-            <div class="cart-item-price">${p.price} руб./шт</div>
+      total += p.price * item.qty; count += item.qty;
+      return `<li>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${p.name}</div>
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty(${p.id},-1)">−</button>
+            <span class="qty-val">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${p.id},1)">+</button>
           </div>
-          <div class="cart-item-total">${p.price * item.qty} руб.</div>
-          <button class="remove-btn" onclick="removeFromCart(${p.id})">✕</button>
-        </li>
-      `;
+          <div class="cart-item-price">${p.price} руб./шт</div>
+        </div>
+        <div class="cart-item-total">${p.price * item.qty} руб.</div>
+        <button class="remove-btn" onclick="removeFromCart(${p.id})">✕</button>
+      </li>`;
     }).join('');
   }
   document.getElementById('cart-count').textContent = count;
   document.getElementById('cart-total').textContent = total;
-  save(KEY_CART, cart);
+  saveCart();
 }
 
 function addToCart(id) {
   const p = products.find(x => x.id === id);
-  if (!p || p.inStock === false) return showToast('Нет в наличии', 'error');
+  if (!p || p.inStock === false) return toast('Нет в наличии', 'error');
   const item = cart.find(x => x.id === id);
-  if (item) item.qty++;
-  else cart.push({ id, qty: 1 });
-  renderCart();
-  showToast(`"${p.name}" добавлен`);
+  if (item) item.qty++; else cart.push({ id, qty: 1 });
+  renderCart(); toast(`"${p.name}" добавлен`);
 }
-
-function changeQty(id, delta) {
+function changeQty(id, d) {
   const item = cart.find(x => x.id === id);
   if (!item) return;
-  item.qty += delta;
+  item.qty += d;
   if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
   renderCart();
 }
-
 function removeFromCart(id) { cart = cart.filter(x => x.id !== id); renderCart(); }
-
 function toggleFav(id) {
   if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
   else favorites.push(id);
-  save(KEY_FAVORITES, favorites);
-  renderProducts();
+  saveFavorites(); renderProducts();
 }
 
 function updateCheckoutTotal() {
   let total = 0;
-  cart.forEach(item => {
-    const p = products.find(x => x.id === item.id);
-    if (p) total += p.price * item.qty;
-  });
-  const discount = (total * currentDiscount) / 100;
-  document.getElementById('discount-amount').textContent = `-${discount.toFixed(2)} руб.`;
-  document.getElementById('final-total').textContent = `${(total - discount).toFixed(2)} руб.`;
+  cart.forEach(i => { const p = products.find(x => x.id === i.id); if (p) total += p.price * i.qty; });
+  const disc = total * currentDiscount / 100;
+  document.getElementById('discount-amount').textContent = `-${disc.toFixed(2)} руб.`;
+  document.getElementById('final-total').textContent = `${(total - disc).toFixed(2)} руб.`;
 }
 
 async function submitOrder() {
   const name = document.getElementById('order-name');
+  const tg = document.getElementById('order-tg');
   const point = document.getElementById('order-point');
   const timeSel = document.getElementById('order-time-select');
   const timeCustom = document.getElementById('order-time-custom');
-  let timeValue = isWeekend() ? timeCustom.value.trim() : timeSel.value;
-  let valid = true;
-  [name, point].forEach(el => {
-    if (!el.value.trim()) { el.classList.add('error'); valid = false; }
-    else el.classList.remove('error');
-  });
-  if (!timeValue) { showToast('Выберите время', 'error'); valid = false; }
-  if (!valid) return;
+  const buyerChat = tg.value.trim();
+  const timeValue = isWeekend() ? timeCustom.value.trim() : timeSel.value;
 
-  if (timeValue > MAX_ORDER_TIME) {
-    return showToast('Последнее время — 22:40', 'error');
-  }
-  if (!isWeekend() && !(PICKUP_POINTS[point.value] || []).includes(timeValue)) {
-    return showToast('Выберите время из списка', 'error');
-  }
+  if (!name.value.trim()) { name.classList.add('error'); return toast('Введи имя', 'error'); }
+  if (!point.value) { point.classList.add('error'); return toast('Выбери точку', 'error'); }
+  if (!timeValue) return toast('Выбери время', 'error');
+  if (timeValue > MAX_TIME) return toast('Последнее время — 22:40', 'error');
+  if (!isWeekend() && !(PICKUP_POINTS[point.value] || []).includes(timeValue)) return toast('Выбери время из списка', 'error');
+  if (buyerChat && !/^\d+$/.test(buyerChat)) return toast('Telegram ID — только цифры (узнать у @userinfobot)', 'error');
 
   let total = 0;
   const items = cart.map(i => {
@@ -934,81 +816,68 @@ async function submitOrder() {
     if (p) total += p.price * i.qty;
     return { name: p.name, qty: i.qty, price: p.price };
   });
-  const discountAmt = (total * currentDiscount) / 100;
+  const discAmt = total * currentDiscount / 100;
 
-  const newOrder = {
+  const order = {
     id: Date.now(),
     date: new Date().toLocaleString('ru-RU'),
     name: name.value.trim(),
     branch: 'Пункт выдачи',
     metro: point.value,
     time: timeValue,
-    items: items,
+    items,
     discount: currentDiscount,
     discountLabel: currentDiscountLabel,
-    total: (total - discountAmt).toFixed(2),
+    total: (total - discAmt).toFixed(2),
     status: 'pending',
-    adminComment: ''
+    buyerChat
   };
 
-  orders.push(newOrder);
-  save(KEY_ORDERS, orders);
+  try {
+    await fetch(SHEETS_URL_HARDCODED, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        date: order.date,
+        name: order.name,
+        branch: order.branch,
+        metro: order.metro,
+        time: order.time,
+        items: order.items.map(i => `${i.name} x${i.qty}`).join('; '),
+        discount: order.discount,
+        total: order.total,
+        status: 'pending',
+        buyerChat: order.buyerChat
+      })
+    });
+  } catch (e) { console.log('Sheets post error', e); }
 
-  if (currentDiscountLabel === 'ХАЛЯВА') incHalyavaCount();
+  let adminText = `🚀 *Новая заявка!*\n\n👤 Клиент: ${order.name}\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Заказ:*\n`;
+  order.items.forEach(i => { adminText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
+  if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
+  adminText += `\n💰 *Итого: ${order.total} руб.*`;
+  for (const chat of TG_ADMIN_CHATS) await tgSend(chat, adminText);
 
-  const tgToken = localStorage.getItem(KEY_TG_TOKEN);
-  const tgChats = (localStorage.getItem(KEY_TG_CHAT) || '').split(',').map(s => s.trim()).filter(Boolean);
-  if (tgToken && tgChats.length) {
-    let tgText = `🚀 *Новая заявка!*\n\n👤 Клиент: ${newOrder.name}\n📍 Точка: ${newOrder.metro}\n⏰ Время: ${newOrder.time}\n\n🛒 *Заказ:*\n`;
-    newOrder.items.forEach(i => { tgText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
-    if (newOrder.discount > 0) tgText += `\n🎁 Скидка ${newOrder.discount}% (${newOrder.discountLabel})`;
-    tgText += `\n💰 *Итого: ${newOrder.total} руб.*`;
-
-    for (const chat of tgChats) {
-      try {
-        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chat, text: tgText, parse_mode: 'Markdown' })
-        });
-      } catch (e) { console.log('Ошибка ТГ для', chat, e); }
-    }
+  if (buyerChat) {
+    let buyerText = `✅ *Заказ принят!*\n\n📍 Точка: ${order.metro}\n⏰ Время: ${order.time}\n\n🛒 *Состав:*\n`;
+    order.items.forEach(i => { buyerText += `• ${i.name} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
+    if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}% (${order.discountLabel})`;
+    buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения.`;
+    const res = await tgSend(buyerChat, buyerText);
+    if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у @Tuman_corner_bot.', 'error');
   }
 
-  const SHEETS_URL = localStorage.getItem(KEY_SHEETS_URL);
-  if (SHEETS_URL) {
-    try {
-      await fetch(SHEETS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          date: newOrder.date,
-          name: newOrder.name,
-          branch: newOrder.branch,
-          metro: newOrder.metro,
-          time: newOrder.time,
-          items: newOrder.items.map(i => `${i.name} x${i.qty}`).join('; '),
-          discount: newOrder.discount,
-          total: newOrder.total,
-          status: 'pending'
-        })
-      });
-    } catch (e) { console.log('Ошибка Google Sheets:', e); }
+  if (currentDiscountLabel === 'ХАЛЯВА') {
+    localStorage.setItem(KEY_HALYAVA, String(halyavaCount() + 1));
   }
 
-  cart = [];
-  currentDiscount = 0;
-  currentDiscountLabel = '';
+  cart = []; currentDiscount = 0; currentDiscountLabel = '';
   renderCart();
-  updateOrdersCount();
   document.getElementById('checkout-modal').classList.remove('open');
   document.getElementById('backdrop').classList.remove('open');
-  showToast('✅ Заявка отправлена!', 'success');
-  name.value = '';
-  point.value = '';
-  timeSel.innerHTML = '<option value="">Сначала выберите точку...</option>';
-  timeCustom.value = '';
+  toast('✅ Заявка отправлена!', 'success');
+  name.value = ''; tg.value = ''; point.value = ''; timeSel.value = ''; timeCustom.value = '';
   document.getElementById('order-promo').value = '';
   document.getElementById('promo-success').style.display = 'none';
   document.getElementById('promo-error').style.display = 'none';
@@ -1018,160 +887,133 @@ async function submitOrder() {
 
 function renderMyOrders() {
   const list = document.getElementById('my-orders-list');
-  if (orders.length === 0) {
-    list.innerHTML = '<p style="text-align:center;color:var(--muted);">У вас пока нет заявок.</p>';
-    return;
-  }
-  list.innerHTML = [...orders].reverse().slice(0, 10).map(o => {
-    const cls = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : '';
-    const statusTxt = { pending: '<span style="color:#ffd700;">⏳ Ожидает проверки админом</span>', approved: '<span style="color:#4ade80;">✅ Одобрено! Ждите сообщения</span>', rejected: '<span style="color:#ff4d4d;">❌ Отклонено</span>' }[o.status];
-    let msgHtml = '';
-    if (o.adminComment) {
-      if (o.status === 'rejected') msgHtml = `<div class="admin-msg reject">Причина отказа: ${o.adminComment}</div>`;
-      else msgHtml = `<div class="admin-msg approve">Сообщение от админа: ${o.adminComment}</div>`;
-    }
-    return `
-      <div class="my-order-card ${cls}">
-        <h4 style="margin:0 0 5px;">Заявка от ${o.date}</h4>
-        <p style="margin:0 0 5px;font-size:13px;color:var(--muted);">Точка: ${o.metro} · Время: ${o.time}</p>
-        <p style="margin:0 0 10px;font-size:13px;">Товары: ${o.items.map(i => i.name).join(', ')}</p>
-        <p style="margin:0;font-weight:bold;font-size:15px;">Статус: ${statusTxt}</p>
-        ${msgHtml}
-        <p style="margin:5px 0 0;font-size:12px;color:var(--muted);">Итого: ${o.total} руб.</p>
-      </div>
-    `;
+  if (!remoteOrders.length) { list.innerHTML = '<p style="color:var(--muted);text-align:center;">Заказов нет. Нажми обновить в админке.</p>'; return; }
+  const my = remoteOrders.slice(-10).reverse();
+  list.innerHTML = my.map(o => {
+    const st = o['Статус'] || 'pending';
+    const cls = st === 'approved' ? 'approved' : st === 'rejected' ? 'rejected' : '';
+    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[st] || st;
+    return `<div class="my-order-card ${cls}">
+      <h4 style="margin:0 0 5px;">${o['Дата'] || ''}</h4>
+      <p style="margin:0 0 5px;font-size:13px;color:var(--muted);">Точка: ${o['Станция'] || ''} · Время: ${o['Время'] || ''}</p>
+      <p style="margin:0 0 5px;font-size:13px;">Товары: ${o['Товары'] || ''}</p>
+      <p style="margin:0;font-weight:bold;">Статус: ${txt}</p>
+      <p style="margin:5px 0 0;font-size:12px;color:var(--muted);">Итого: ${o['Итого'] || ''} руб.</p>
+    </div>`;
   }).join('');
 }
 
-function updateOrdersCount() {
-  const el = document.getElementById('orders-count');
-  if (el) el.textContent = orders.length;
+async function loadRemoteOrders() {
+  try {
+    const res = await fetch(SHEETS_URL_HARDCODED + '?t=' + Date.now());
+    remoteOrders = await res.json();
+    return true;
+  } catch (e) { console.log('load error', e); remoteOrders = []; return false; }
 }
 
 async function renderAdminOrders() {
   const list = document.getElementById('orders-list');
-  const url = localStorage.getItem(KEY_SHEETS_URL);
-  if (!url) {
-    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Сначала укажи URL Google Таблицы в настройках</div>';
-    return;
-  }
   list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Загрузка...</div>';
-  let remote = [];
-  try {
-    const res = await fetch(url + '?t=' + Date.now());
-    remote = await res.json();
-  } catch (e) {
-    list.innerHTML = '<div style="text-align:center;padding:20px;color:#ff4d4d;">Не удалось загрузить заказы</div>';
-    return;
-  }
-  const search = document.getElementById('admin-search-orders').value.toLowerCase().trim();
-  const filter = document.getElementById('admin-filter-orders').value;
-  const mapped = remote.map((r, i) => ({
-    id: i,
-    date: r['Дата'] || '',
-    name: r['Имя'] || '',
-    branch: r['Ветка'] || '',
-    metro: r['Станция'] || '',
-    time: r['Время'] || '',
-    itemsText: r['Товары'] || '',
-    discount: r['Скидка'] || 0,
-    total: r['Итого'] || '',
-    status: r['Статус'] || 'pending'
-  }));
-  const filtered = mapped.filter(o => {
-    if (search && !o.name.toLowerCase().includes(search) && !o.metro.toLowerCase().includes(search)) return false;
-    if (filter !== 'all' && o.status !== filter) return false;
-    return true;
-  });
-  if (filtered.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Заявок нет</div>';
-    return;
-  }
-  list.innerHTML = [...filtered].reverse().map(o => {
-    const cls = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : '';
-    const statusTxt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[o.status] || o.status;
-    return `
-      <div class="order-card ${cls}">
-        <h4>${o.date}</h4>
-        <p><strong>Клиент:</strong> ${o.name}</p>
-        <p><strong>Точка:</strong> ${o.metro}</p>
-        <p><strong>Время:</strong> ${o.time}</p>
-        <p><strong>Статус:</strong> ${statusTxt}</p>
-        <div class="order-items">
-          ${String(o.itemsText).replace(/; /g, '<br>')}
-          <br><br>
-          ${o.discount > 0 ? `<strong>Скидка: ${o.discount}%</strong><br>` : ''}
-          <strong style="color:var(--purple-light);font-size:16px;">Итого: ${o.total} руб.</strong>
-        </div>
+  const ok = await loadRemoteOrders();
+  if (!ok) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ff4d4d;">Не удалось загрузить. Проверь URL таблицы и доступ.</div>'; return; }
+  const q = document.getElementById('admin-search-orders').value.toLowerCase().trim();
+  const f = document.getElementById('admin-filter-orders').value;
+  let items = remoteOrders.map(r => ({ ...r, _status: r['Статус'] || 'pending' }));
+  if (q) items = items.filter(r => (r['Имя']||'').toLowerCase().includes(q) || (r['Станция']||'').toLowerCase().includes(q));
+  if (f !== 'all') items = items.filter(r => r._status === f);
+  if (!items.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Заявок нет</div>'; return; }
+  list.innerHTML = items.slice().reverse().map(o => {
+    const cls = o._status === 'approved' ? 'approved' : o._status === 'rejected' ? 'rejected' : '';
+    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[o._status] || o._status;
+    const btn = o._status === 'pending' ? `
+      <button class="order-btn btn-approve" onclick="changeStatus(${o._row},'approved')">✅ Одобрить</button>
+      <button class="order-btn btn-reject" onclick="changeStatus(${o._row},'rejected')">❌ Отклонить</button>` : '';
+    return `<div class="order-card ${cls}">
+      <div class="order-actions">${btn}</div>
+      <h4>${o['Дата'] || ''}</h4>
+      <p><strong>Клиент:</strong> ${o['Имя'] || ''}</p>
+      <p><strong>Точка:</strong> ${o['Станция'] || ''}</p>
+      <p><strong>Время:</strong> ${o['Время'] || ''}</p>
+      <p><strong>Статус:</strong> ${txt}</p>
+      <div class="order-items">
+        ${String(o['Товары'] || '').replace(/; /g, '<br>')}
+        <br><br>
+        ${Number(o['Скидка']) > 0 ? `<strong>Скидка: ${o['Скидка']}%</strong><br>` : ''}
+        <strong style="color:var(--purple-light);font-size:16px;">Итого: ${o['Итого'] || ''} руб.</strong>
       </div>
-    `;
+    </div>`;
   }).join('');
+}
+
+async function changeStatus(row, status) {
+  try {
+    await fetch(SHEETS_URL_HARDCODED, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'status', row: row, status: status })
+    });
+    toast(status === 'approved' ? 'Заказ одобрен' : 'Заказ отклонён', 'success');
+  } catch (e) { console.log(e); }
+
+  const o = remoteOrders.find(r => r._row === row);
+  if (o && o['TelegramID']) {
+    const chat = String(o['TelegramID']).trim();
+    if (/^\d+$/.test(chat)) {
+      let text;
+      if (status === 'approved') {
+        text = `✅ *Ваш заказ подтверждён!*\n\n📍 Точка: ${o['Станция'] || ''}\n⏰ Время: ${o['Время'] || ''}\n\n💰 Итого: ${o['Итого'] || ''} руб.\n\nЖдём вас!`;
+      } else {
+        text = `❌ *Ваш заказ отклонён.*\n\n📍 Точка: ${o['Станция'] || ''}\n⏰ Время: ${o['Время'] || ''}\n\nСвяжитесь с нами для уточнения.`;
+      }
+      const res = await tgSend(chat, text);
+      if (!res.ok) toast('Бот не смог написать покупателю. Пусть нажмёт Start.', 'error');
+    }
+  }
+
+  setTimeout(renderAdminOrders, 1500);
 }
 
 function renderAdminTable() {
   const tbody = document.querySelector('#admin-table tbody');
   tbody.innerHTML = products.map(p => {
-    const thumb = p.photo
-      ? `<img src="${p.photo}" class="thumb" alt="">`
-      : `<div class="thumb-empty">${p.icon}</div>`;
-    return `
-      <tr>
-        <td>
-          <div class="photo-upload">
-            ${thumb}
-            <label for="photo-${p.id}">📷</label>
-            <input type="file" id="photo-${p.id}" accept="image/*" onchange="setProductPhoto(${p.id}, this)">
-            ${p.photo ? `<button class="clear-photo" onclick="clearProductPhoto(${p.id})">✕</button>` : ''}
-          </div>
-        </td>
-        <td><input type="text" value="${p.icon}" onchange="editProd(${p.id},'icon',this.value)" style="text-align:center;"></td>
-        <td><input type="text" value="${p.name.replace(/"/g,'&quot;')}" onchange="editProd(${p.id},'name',this.value)"></td>
-        <td><input type="number" value="${p.price}" onchange="editProd(${p.id},'price',this.value)"></td>
-        <td>
-          <select onchange="editProd(${p.id},'category',this.value)">
-            <option value="liquid" ${p.category==='liquid'?'selected':''}>Жидкость</option>
-            <option value="snus" ${p.category==='snus'?'selected':''}>Снюс</option>
-            <option value="device" ${p.category==='device'?'selected':''}>Под-система</option>
-            <option value="accessory" ${p.category==='accessory'?'selected':''}>Расходник</option>
-          </select>
-        </td>
-        <td style="text-align:center;"><input type="checkbox" ${p.inStock?'checked':''} onchange="editProd(${p.id},'inStock',this.checked)"></td>
-        <td><button class="button" style="background:#ff4d4d;color:#fff;padding:5px 10px;" onclick="deleteProd(${p.id})">Удалить</button></td>
-      </tr>
-    `;
+    const thumb = p.photo ? `<img src="${p.photo}" class="thumb">` : `<div class="thumb-empty">${p.icon}</div>`;
+    return `<tr>
+      <td><div class="photo-upload">
+        ${thumb}
+        <label for="photo-${p.id}">📷</label>
+        <input type="file" id="photo-${p.id}" accept="image/*" onchange="setProductPhoto(${p.id},this)">
+        ${p.photo ? `<button class="clear-photo" onclick="clearProductPhoto(${p.id})">✕</button>` : ''}
+      </div></td>
+      <td><input type="text" value="${p.icon}" onchange="editProd(${p.id},'icon',this.value)" style="text-align:center;"></td>
+      <td><input type="text" value="${p.name.replace(/"/g,'&quot;')}" onchange="editProd(${p.id},'name',this.value)"></td>
+      <td><input type="number" value="${p.price}" onchange="editProd(${p.id},'price',this.value)"></td>
+      <td><select onchange="editProd(${p.id},'category',this.value)">
+        <option value="liquid" ${p.category==='liquid'?'selected':''}>Жидкость</option>
+        <option value="snus" ${p.category==='snus'?'selected':''}>Снюс</option>
+        <option value="device" ${p.category==='device'?'selected':''}>Под-система</option>
+        <option value="accessory" ${p.category==='accessory'?'selected':''}>Расходник</option>
+      </select></td>
+      <td style="text-align:center;"><input type="checkbox" ${p.inStock?'checked':''} onchange="editProd(${p.id},'inStock',this.checked)"></td>
+      <td><button class="button" style="background:#ff4d4d;color:#fff;padding:5px 10px;" onclick="deleteProd(${p.id})">Удалить</button></td>
+    </tr>`;
   }).join('');
 }
 
 function setProductPhoto(id, input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 800 * 1024) {
-    showToast('Файл больше 800 КБ — уменьши или сожми', 'error');
-    return;
-  }
+  const file = input.files[0]; if (!file) return;
+  if (file.size > 800*1024) return toast('Файл больше 800 КБ', 'error');
   const r = new FileReader();
   r.onload = (ev) => {
-    const p = products.find(x => x.id === id);
-    if (!p) return;
-    p.photo = ev.target.result;
-    save(KEY_PRODUCTS, products);
-    renderAdminTable();
-    renderProducts();
-    showToast('Фото обновлено');
+    const p = products.find(x => x.id === id); if (!p) return;
+    p.photo = ev.target.result; saveProducts(); renderAdminTable(); renderProducts(); toast('Фото обновлено');
   };
   r.readAsDataURL(file);
 }
-
 function clearProductPhoto(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
-  p.photo = '';
-  save(KEY_PRODUCTS, products);
-  renderAdminTable();
-  renderProducts();
-  showToast('Фото удалено');
+  const p = products.find(x => x.id === id); if (!p) return;
+  p.photo = ''; saveProducts(); renderAdminTable(); renderProducts(); toast('Фото удалено');
 }
-
 function addNewProduct() {
   const name = document.getElementById('np-name').value.trim();
   const price = parseFloat(document.getElementById('np-price').value);
@@ -1179,61 +1021,34 @@ function addNewProduct() {
   const icon = document.getElementById('np-icon').value.trim() || '📦';
   const desc = document.getElementById('np-desc').value.trim();
   const inStock = document.getElementById('np-stock').checked;
-  const photoInput = document.getElementById('np-photo');
-
-  if (!name) return showToast('Введи название', 'error');
-  if (isNaN(price) || price <= 0) return showToast('Введи цену', 'error');
-
+  const file = document.getElementById('np-photo').files[0];
+  if (!name) return toast('Введи название', 'error');
+  if (isNaN(price) || price <= 0) return toast('Введи цену', 'error');
   const catNames = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' };
-  const newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
-  const newProduct = {
-    id: newId, name, price, desc, category,
-    categoryName: catNames[category],
-    icon, inStock, photo: ''
+  const id = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
+  const finish = (photo) => {
+    products.push({ id, name, price, desc, category, categoryName: catNames[category], icon, inStock, photo: photo || '' });
+    saveProducts(); renderAdminTable(); renderProducts(); toast('Товар добавлен');
+    document.getElementById('np-name').value=''; document.getElementById('np-price').value='';
+    document.getElementById('np-desc').value=''; document.getElementById('np-photo').value='';
   };
-
-  const finish = (photoData) => {
-    if (photoData) newProduct.photo = photoData;
-    products.push(newProduct);
-    save(KEY_PRODUCTS, products);
-    renderAdminTable();
-    renderProducts();
-    document.getElementById('np-name').value = '';
-    document.getElementById('np-price').value = '';
-    document.getElementById('np-desc').value = '';
-    document.getElementById('np-photo').value = '';
-    showToast('Товар добавлен');
-  };
-
-  const file = photoInput.files[0];
   if (file) {
-    if (file.size > 800 * 1024) { showToast('Фото больше 800 КБ', 'error'); return; }
-    const r = new FileReader();
-    r.onload = (ev) => finish(ev.target.result);
-    r.readAsDataURL(file);
-  } else {
-    finish(null);
-  }
+    if (file.size > 800*1024) return toast('Фото больше 800 КБ', 'error');
+    const r = new FileReader(); r.onload = (e) => finish(e.target.result); r.readAsDataURL(file);
+  } else finish(null);
 }
-
 function editProd(id, field, val) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
+  const p = products.find(x => x.id === id); if (!p) return;
   if (field === 'price') p.price = Number(val);
   else if (field === 'inStock') p.inStock = val;
   else p[field] = val;
   if (field === 'category') p.categoryName = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' }[val];
-  save(KEY_PRODUCTS, products);
-  renderProducts();
+  saveProducts(); renderProducts();
 }
-
 function deleteProd(id) {
-  if (confirm('Удалить?')) {
-    products = products.filter(x => x.id !== id);
-    save(KEY_PRODUCTS, products);
-    renderAdminTable();
-    renderProducts();
-  }
+  if (!confirm('Удалить?')) return;
+  products = products.filter(x => x.id !== id);
+  saveProducts(); renderAdminTable(); renderProducts();
 }
 
 init();
