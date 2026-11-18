@@ -134,6 +134,8 @@ a { color:inherit; text-decoration:none; }
 .toast-container { position:fixed; bottom:20px; right:20px; z-index:1000; display:flex; flex-direction:column; gap:10px; }
 .toast { padding:15px 20px; background:var(--panel); border:1px solid var(--purple); border-radius:10px; font-weight:bold; animation:slideIn .3s; }
 @keyframes slideIn { from{transform:translateX(100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+.brand-flavor-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.brand-flavor-item { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px; background:rgba(0,0,0,.15); border:1px solid var(--border); border-radius:8px; }
 @media (max-width:820px) { .product-grid { grid-template-columns:repeat(2,1fr); } .nav-links { display:none; } }
 @media (max-width:600px) { .product-grid { grid-template-columns:1fr; } .admin-form { grid-template-columns:1fr; } .admin-form button { grid-column:span 1; } .admin-form h3, .admin-form .full { grid-column:span 1; } .order-actions { position:relative; top:0; right:0; margin-bottom:10px; } }
 </style>
@@ -309,6 +311,7 @@ a { color:inherit; text-decoration:none; }
       <button class="icon-button" id="close-brand">✕</button>
     </div>
     <div id="brand-list"></div>
+    <div class="brand-flavor-list" id="brand-flavor-list"></div>
   </div>
 </div>
 
@@ -321,6 +324,7 @@ a { color:inherit; text-decoration:none; }
     <div class="admin-tabs">
       <button class="tab-btn active" data-tab="orders">📋 Заявки</button>
       <button class="tab-btn" data-tab="products">📦 Товары</button>
+      <button class="tab-btn" data-tab="brands">🏷️ Бренды и вкусы</button>
       <button class="tab-btn" data-tab="settings">⚙️ Настройки</button>
     </div>
 
@@ -341,7 +345,8 @@ a { color:inherit; text-decoration:none; }
     <div id="tab-products" class="tab-content" style="display:none;">
       <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
         <button class="button button-secondary" id="reload-products">🔄 Обновить с сервера</button>
-        <button class="button button-secondary" id="seed-products">📥 Загрузить встроенный каталог в таблицу</button>
+        <button class="button button-secondary" id="seed-products">📥 Загрузить встроенный каталог</button>
+        <button class="button" id="add-new-product-btn" style="background:#4ade80;color:#000;">➕ Добавить товар</button>
       </div>
       <div style="overflow-x:auto;">
         <table class="admin-table" id="admin-table">
@@ -350,34 +355,40 @@ a { color:inherit; text-decoration:none; }
               <th style="width:60px;">Фото</th>
               <th style="width:44px;">Иконка</th>
               <th>Название</th>
-              <th style="width:110px;">Бренд</th>
-              <th style="width:110px;">Вкус</th>
-              <th style="width:80px;">Цена</th>
-              <th style="width:70px;">Кол-во</th>
-              <th style="width:110px;">Категория</th>
-              <th style="width:80px;"></th>
+              <th style="width:120px;">Бренд</th>
+              <th style="width:120px;">Вкус</th>
+              <th style="width:70px;">Цена</th>
+              <th style="width:60px;">Кол-во</th>
+              <th style="width:100px;">Категория</th>
+              <th style="width:100px;"></th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-      <div class="admin-form" id="new-product-form">
-        <h3>Добавить новый товар</h3>
-        <input type="text" id="np-name" placeholder="Название (Бренд — Вкус)" class="full">
-        <input type="text" id="np-brand" placeholder="Бренд (например: Злая Монашка Bubble 70mg)">
-        <input type="text" id="np-flavor" placeholder="Вкус (например: Мятная Жвачка)">
-        <input type="number" id="np-price" placeholder="Цена (руб.)" step="0.01">
-        <input type="number" id="np-stock-count" placeholder="Количество" value="10" min="0" step="1">
-        <select id="np-category">
+    </div>
+
+    <div id="tab-brands" class="tab-content" style="display:none;">
+      <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+        <button class="button button-secondary" id="reload-brands">🔄 Обновить</button>
+      </div>
+      <div id="brands-list"></div>
+      <div class="admin-form" id="add-flavor-form">
+        <h3>Добавить вкус к бренду</h3>
+        <input type="text" id="af-brand" placeholder="Бренд (например: Злая Монашка Bubble 70mg)" class="full">
+        <input type="text" id="af-flavor" placeholder="Вкус (например: Мятная Жвачка)" class="full">
+        <input type="number" id="af-price" placeholder="Цена (руб.)" step="0.01" value="15">
+        <input type="number" id="af-stock" placeholder="Количество" value="20" min="0" step="1">
+        <select id="af-category">
           <option value="liquid">Жидкость</option>
           <option value="snus">Снюс</option>
           <option value="device">Под-система</option>
           <option value="accessory">Расходник</option>
         </select>
-        <input type="text" id="np-icon" placeholder="Иконка (эмодзи)" value="📦">
-        <input type="text" id="np-desc" placeholder="Краткое описание" value="">
-        <input type="file" id="np-photo" accept="image/*" class="full">
-        <button class="button" id="add-product-btn">Добавить товар</button>
+        <input type="text" id="af-icon" placeholder="Иконка (эмодзи)" value="📦">
+        <input type="text" id="af-desc" placeholder="Краткое описание" value="">
+        <input type="file" id="af-photo" accept="image/*" class="full">
+        <button class="button" id="add-flavor-btn">Добавить вкус</button>
       </div>
     </div>
 
@@ -415,7 +426,7 @@ const TG_TOKEN_HARDCODED = '9246321007:AAF-zJKz9e2XsQSoPwcPHNCD8JzXc9cXAFg';
 const TG_CHATS_HARDCODED = '5512515146,8570615330';
 const ADMIN_PASSWORD = 'Skitolss';
 
-const KEY_PRODUCTS_CACHE = 'tuman_products_cache_v13';
+const KEY_PRODUCTS_CACHE = 'tuman_products_cache_v14';
 const KEY_CART = 'tuman_cart_v8';
 const KEY_FAVORITES = 'tuman_favorites_v8';
 const KEY_THEME = 'tuman_theme_v8';
@@ -433,7 +444,7 @@ const MAX_TIME = "22:40";
 const CATEGORY_NAMES = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' };
 
 /* ============================================================
-   ВСТРОЕННЫЙ КАТАЛОГ (brand / flavor добавлены автоматически)
+   ВСТРОЕННЫЙ КАТАЛОГ (brand + flavor)
    ============================================================ */
 const BUILTIN_PRODUCTS = [
   { id:1, name:"Annima Love 50mg — Смородина вишня черника", brand:"Annima Love 50mg", flavor:"Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", stock:20, photo:"" },
@@ -790,6 +801,7 @@ function attachEvents() {
     await loadProductsFromServer(true);
     renderAdminTable();
     renderAdminOrders();
+    renderBrandsList();
   };
   document.getElementById('close-admin').onclick = () => document.getElementById('admin-modal').classList.remove('open');
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -800,18 +812,20 @@ function attachEvents() {
       document.getElementById('tab-'+btn.dataset.tab).style.display='block';
       if (btn.dataset.tab === 'orders') renderAdminOrders();
       if (btn.dataset.tab === 'products') renderAdminTable();
+      if (btn.dataset.tab === 'brands') renderBrandsList();
     };
   });
   document.getElementById('admin-search-orders').oninput = debounce(renderAdminOrders, 350);
   document.getElementById('admin-filter-orders').onchange = renderAdminOrders;
   document.getElementById('refresh-orders').onclick = renderAdminOrders;
-  document.getElementById('add-product-btn').onclick = addNewProduct;
   document.getElementById('reload-products').onclick = async () => {
     await loadProductsFromServer(true);
     renderAdminTable(); renderProducts();
     toast('Товары обновлены', 'success');
   };
   document.getElementById('seed-products').onclick = seedProducts;
+  document.getElementById('reload-brands').onclick = () => { renderBrandsList(); toast('Обновлено', 'success'); };
+  document.getElementById('add-flavor-btn').onclick = addFlavorFromForm;
   document.getElementById('save-settings').onclick = () => {
     localStorage.setItem('tuman_tg_token', document.getElementById('set-tg-token').value.trim());
     localStorage.setItem('tuman_tg_chats', document.getElementById('set-tg-chat').value.trim());
@@ -830,7 +844,7 @@ async function seedProducts() {
   }
   toast(`Готово: ${ok} добавлено, ${fail} ошибок`, fail ? 'error' : 'success');
   await loadProductsFromServer(true);
-  renderAdminTable(); renderProducts();
+  renderAdminTable(); renderProducts(); renderBrandsList();
 }
 
 async function checkBot() {
@@ -853,7 +867,7 @@ async function checkBot() {
   setTimeout(() => { result.textContent=''; }, 10000);
 }
 
-/* ===== РЕНДЕР КАТАЛОГА (плоский, как раньше) ===== */
+/* ===== РЕНДЕР КАТАЛОГА (плоский) ===== */
 function renderProducts() {
   const grid = document.getElementById('product-grid');
   if (!products.length) {
@@ -898,9 +912,41 @@ function renderProducts() {
   }).join('');
 }
 
-/* ===== АДМИН: добавить вкус к бренду ===== */
-async function addFlavorToBrand(brand) {
-  const flavor = prompt(`Новый вкус для бренда "${brand}":`);
+/* ===== БРЕНДЫ И ВКУСЫ (админ) ===== */
+function renderBrandsList() {
+  const wrap = document.getElementById('brands-list');
+  if (!wrap) return;
+  const map = new Map();
+  products.forEach(p => {
+    const b = getBrand(p);
+    if (!map.has(b)) map.set(b, []);
+    map.get(b).push(p);
+  });
+  const keys = Array.from(map.keys()).sort((a,b)=>a.localeCompare(b));
+  wrap.innerHTML = keys.map(brand => {
+    const items = map.get(brand);
+    const flavors = items.map(p => `<div class="brand-flavor-item">
+      <div>
+        <div style="font-weight:bold;">${escapeHtml(getFlavor(p) || '—')}</div>
+        <div style="font-size:11px;color:var(--muted);">Осталось: ${getStock(p)} шт. · ${escapeHtml(p.price)} руб.</div>
+      </div>
+      <div style="display:flex;gap:5px;">
+        <button class="button" style="background:var(--purple);color:#1b0d29;padding:4px 8px;font-size:11px;" onclick="quickAddFlavor('${escapeHtml(brand).replace(/'/g,"\\'")}')">+ Вкус</button>
+        <button class="button" style="background:#ff4d4d;color:#fff;padding:4px 8px;font-size:11px;" onclick="deleteProd(${Number(p.id)})">✕</button>
+      </div>
+    </div>`).join('');
+    return `<div style="margin-bottom:18px;padding:14px;background:rgba(0,0,0,.15);border:1px solid var(--border);border-radius:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <h3 style="margin:0;font-size:16px;">${escapeHtml(brand)}</h3>
+        <span style="font-size:12px;color:var(--muted);">${items.length} вкус(ов)</span>
+      </div>
+      <div class="brand-flavor-list">${flavors}</div>
+    </div>`;
+  }).join('');
+}
+
+async function quickAddFlavor(brand) {
+  const flavor = prompt(`Новый вкус для «${brand}»:`);
   if (!flavor || !flavor.trim()) return;
   const base = products.find(p => getBrand(p) === brand);
   if (!base) return toast('Бренд не найден', 'error');
@@ -908,7 +954,7 @@ async function addFlavorToBrand(brand) {
   if (priceStr === null) return;
   const price = parseFloat(priceStr);
   if (isNaN(price) || price <= 0) return toast('Неверная цена', 'error');
-  const stockStr = prompt('Количество:', '10');
+  const stockStr = prompt('Количество:', '20');
   if (stockStr === null) return;
   const stock = parseInt(stockStr, 10);
   if (isNaN(stock) || stock < 0) return toast('Неверное количество', 'error');
@@ -921,9 +967,39 @@ async function addFlavorToBrand(brand) {
   });
   products.push(product);
   localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
-  renderAdminTable(); renderProducts();
+  renderAdminTable(); renderProducts(); renderBrandsList();
   await saveProductToServer(product);
   toast(`Вкус «${flavor}» добавлен`);
+}
+
+async function addFlavorFromForm() {
+  const brand = document.getElementById('af-brand').value.trim();
+  const flavor = document.getElementById('af-flavor').value.trim();
+  const price = parseFloat(document.getElementById('af-price').value);
+  const stock = parseInt(document.getElementById('af-stock').value, 10);
+  const category = document.getElementById('af-category').value;
+  const icon = document.getElementById('af-icon').value.trim() || '📦';
+  const desc = document.getElementById('af-desc').value.trim();
+  const file = document.getElementById('af-photo').files[0];
+  if (!brand) return toast('Введи бренд', 'error');
+  if (!flavor) return toast('Введи вкус', 'error');
+  if (isNaN(price) || price <= 0) return toast('Введи цену', 'error');
+  if (isNaN(stock) || stock < 0) return toast('Введи количество', 'error');
+  const id = products.length ? Math.max(...products.map(p => Number(p.id))) + 1 : 1;
+  let photo = '';
+  if (file) { try { photo = await compressImage(file, 1000, 0.85); } catch(e){} }
+  const product = syncName({
+    id, brand, flavor,
+    name: '', price, desc, category, categoryName: CATEGORY_NAMES[category],
+    icon, stock, inStock: stock>0, photo
+  });
+  products.push(product);
+  localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+  renderAdminTable(); renderProducts(); renderBrandsList();
+  await saveProductToServer(product);
+  toast('Вкус добавлен');
+  document.getElementById('af-brand').value=''; document.getElementById('af-flavor').value='';
+  document.getElementById('af-desc').value=''; document.getElementById('af-photo').value='';
 }
 
 function renderCart() {
@@ -1204,7 +1280,7 @@ function renderAdminTable() {
         <option value="accessory" ${p.category==='accessory'?'selected':''}>Расходник</option>
       </select></td>
       <td>
-        <button class="button" style="background:var(--purple);color:#1b0d29;padding:4px 8px;font-size:11px;margin-bottom:4px;" onclick="addFlavorToBrand('${escapeHtml(brand).replace(/'/g,"\\'")}')">+ Вкус</button>
+        <button class="button" style="background:var(--purple);color:#1b0d29;padding:4px 8px;font-size:11px;margin-bottom:4px;" onclick="quickAddFlavor('${escapeHtml(brand).replace(/'/g,"\\'")}')">+ Вкус</button>
         <button class="button" style="background:#ff4d4d;color:#fff;padding:5px 10px;" onclick="deleteProd(${id})">Удалить</button>
       </td>
     </tr>`;
@@ -1238,7 +1314,7 @@ async function setProductPhoto(id, input) {
     const p = products.find(x => x.id === id); if (!p) return;
     p.photo = dataUrl;
     localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
-    renderAdminTable(); renderProducts();
+    renderAdminTable(); renderProducts(); renderBrandsList();
     await saveProductToServer(p);
     toast('Фото обновлено');
   } catch (e) { toast('Ошибка фото', 'error'); }
@@ -1247,44 +1323,11 @@ function clearProductPhoto(id) {
   const p = products.find(x => x.id === id); if (!p) return;
   p.photo = '';
   localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
-  renderAdminTable(); renderProducts();
+  renderAdminTable(); renderProducts(); renderBrandsList();
   saveProductToServer(p);
   toast('Фото удалено');
 }
-async function addNewProduct() {
-  const name = document.getElementById('np-name').value.trim();
-  const brand = document.getElementById('np-brand').value.trim();
-  const flavor = document.getElementById('np-flavor').value.trim();
-  const price = parseFloat(document.getElementById('np-price').value);
-  const stock = parseInt(document.getElementById('np-stock-count').value, 10);
-  const category = document.getElementById('np-category').value;
-  const icon = document.getElementById('np-icon').value.trim() || '📦';
-  const desc = document.getElementById('np-desc').value.trim();
-  const file = document.getElementById('np-photo').files[0];
-  if (!name && !brand) return toast('Введи название или бренд', 'error');
-  if (isNaN(price) || price <= 0) return toast('Введи цену', 'error');
-  if (isNaN(stock) || stock < 0) return toast('Введи количество', 'error');
-  const id = products.length ? Math.max(...products.map(p => Number(p.id))) + 1 : 1;
-  let photo = '';
-  if (file) { try { photo = await compressImage(file, 1000, 0.85); } catch(e){} }
-  const product = syncName({
-    id,
-    brand: brand || name,
-    flavor: flavor || '',
-    name: name || brand,
-    price, desc, category, categoryName: CATEGORY_NAMES[category],
-    icon, stock, inStock: stock>0, photo
-  });
-  products.push(product);
-  localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
-  renderAdminTable(); renderProducts();
-  await saveProductToServer(product);
-  toast('Товар добавлен');
-  document.getElementById('np-name').value=''; document.getElementById('np-brand').value='';
-  document.getElementById('np-flavor').value=''; document.getElementById('np-price').value='';
-  document.getElementById('np-desc').value=''; document.getElementById('np-photo').value='';
-  document.getElementById('np-stock-count').value='10';
-}
+
 async function editProd(id, field, val) {
   const p = products.find(x => x.id === id); if (!p) return;
   if (field === 'price') p.price = Number(val);
@@ -1300,7 +1343,7 @@ async function deleteProd(id) {
   if (!confirm('Удалить?')) return;
   products = products.filter(x => x.id !== id);
   localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
-  renderAdminTable(); renderProducts();
+  renderAdminTable(); renderProducts(); renderBrandsList();
   await deleteProductFromServer(id);
 }
 
