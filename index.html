@@ -253,7 +253,7 @@ a { color:inherit; text-decoration:none; }
     <div class="form-group">
       <label>Ваш Telegram ID (для уведомлений)</label>
       <input type="text" id="order-tg" placeholder="Например, 123456789 — узнать у @userinfobot" inputmode="numeric">
-      <p style="font-size:12px;color:var(--muted);margin:5px 0 0;">Необязательно. Если указать — бот пришлёт подтверждение и статус заказа. Важно: нажмите Start у @Tuman_corner_bot.</p>
+      <p style="font-size:12px;color:var(--muted);margin:5px 0 0;">Необязательно. Если указать — бот пришлёт подтверждение и статус заказа. Важно: нажмите Start у бота.</p>
     </div>
     <div class="form-group">
       <label>Точка выдачи</label>
@@ -389,8 +389,8 @@ a { color:inherit; text-decoration:none; }
 
 /* ===== КОНСТАНТЫ ===== */
 const SHEETS_URL_HARDCODED = 'https://script.google.com/macros/s/AKfycbykJzFegxx7Zkco8hYO6j67sgovSKlEfOkfU1IAIjMGSlWTIY4xaTTBGUUrtwF0ULS3/exec';
-const TG_TOKEN_HARDCODED = '8908220363:AAFVUfFRrGrEXd-UqxEI5hDImyJ1fnPqN2U';
-const TG_CHATS_HARDCODED = '5512515146,8570615330,8736479925';
+const TG_TOKEN_HARDCODED = '9246321007:AAF-zJKz9e2XsQSoPwcPHNCD8JzXc9cXAFg';
+const TG_CHATS_HARDCODED = '9246321007';
 const ADMIN_PASSWORD = 'Skitolss';
 
 const KEY_PRODUCTS = 'tuman_products_v8';
@@ -614,8 +614,7 @@ async function loadProductsFromServer(force = false) {
 async function saveProductToServer(product) {
   try {
     await fetch(sheetsUrl(), {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'saveProduct', product })
     });
@@ -626,8 +625,7 @@ async function saveProductToServer(product) {
 async function deleteProductFromServer(id) {
   try {
     await fetch(sheetsUrl(), {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'deleteProduct', id })
     });
@@ -638,8 +636,7 @@ async function deleteProductFromServer(id) {
 async function submitStockChanges(changes) {
   try {
     await fetch(sheetsUrl(), {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'stockChanges', changes })
     });
@@ -989,8 +986,7 @@ async function submitOrder() {
 
     try {
       await fetch(sheetsUrl(), {
-        method: 'POST',
-        mode: 'no-cors',
+        method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           date: order.date,
@@ -1020,7 +1016,7 @@ async function submitOrder() {
       if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}% (${escapeMd(order.discountLabel)})`;
       buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения, по вопросам @nekati_n`;
       const res = await tgSend(buyerChat, buyerText);
-      if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у @Tuman_corner_bot.', 'error');
+      if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у бота.', 'error');
     }
 
     if (currentDiscountLabel === 'ХАЛЯВА') {
@@ -1125,13 +1121,11 @@ async function changeStatus(row, status) {
     toast(status === 'approved' ? 'Заказ одобрен' : 'Заказ отклонён', 'success');
   } catch (e) { console.log(e); }
 
-  // При отклонении — вернуть остатки
   if (status === 'rejected') {
     const o = remoteOrders.find(r => Number(r._row) === Number(row));
     if (o && o['Товары']) {
-      const itemsStr = String(o['Товары']);
       const changes = [];
-      itemsStr.split('; ').forEach(part => {
+      String(o['Товары']).split('; ').forEach(part => {
         const m = part.match(/^(.+) x(\d+)$/);
         if (m) {
           const p = products.find(x => x.name === m[1].trim());
