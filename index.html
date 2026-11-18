@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -255,6 +254,10 @@ a { color:inherit; text-decoration:none; }
       <label>Ваш Telegram ID (для уведомлений)</label>
       <input type="text" id="order-tg" placeholder="Например, 123456789 — узнать у @userinfobot" inputmode="numeric">
       <p style="font-size:12px;color:var(--muted);margin:5px 0 0;">Необязательно. Если указать — бот пришлёт подтверждение и статус заказа.</p>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button type="button" class="button button-secondary" id="check-bot-btn" style="font-size:12px;padding:6px 12px;min-height:34px;">🔔 Проверить бота</button>
+        <span id="check-bot-result" style="font-size:12px;align-self:center;"></span>
+      </div>
     </div>
     <div class="form-group">
       <label>Точка выдачи</label>
@@ -379,6 +382,7 @@ a { color:inherit; text-decoration:none; }
         <input type="text" id="set-sheets-url" style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;">
       </div>
       <button class="button" id="save-settings" style="margin-bottom:30px;">Сохранить настройки</button>
+      <p style="font-size:12px;color:var(--muted);">⚠️ После сохранения токена/ID обновите страницу.</p>
     </div>
   </div>
 </div>
@@ -389,26 +393,20 @@ a { color:inherit; text-decoration:none; }
 "use strict";
 
 /* ============================================================
-   КОНСТАНТЫ
+   КОНСТАНТЫ — ЗАМЕНИТЕ НА СВОИ
    ============================================================ */
 const SHEETS_URL_HARDCODED = 'https://script.google.com/macros/s/AKfycbykJzFegxx7Zkco8hYO6j67sgovSKlEfOkfU1IAIjMGSlWTIY4xaTTBGUUrtwF0ULS3/exec';
-
-// Токен бота
 const TG_TOKEN_HARDCODED = '9246321007:AAF-zJKz9e2XsQSoPwcPHNCD8JzXc9cXAFg';
-
-// ✅ ВАШ ЛИЧНЫЙ ID (не ID бота!)
-const TG_CHATS_HARDCODED = '5512515146,9246321007';
-
+const TG_CHATS_HARDCODED = '5512515146,8570615330';
 const ADMIN_PASSWORD = 'Skitolss';
 
-const KEY_PRODUCTS = 'tuman_products_v8';
-const KEY_CART = 'tuman_cart_v5';
-const KEY_FAVORITES = 'tuman_favorites_v5';
-const KEY_THEME = 'tuman_theme_v5';
-const KEY_AGE = 'tuman_age_v5';
-const KEY_HALYAVA = 'tuman_promo_halyava';
-const KEY_MY_CHAT = 'tuman_my_chat';
-const KEY_PRODUCTS_TS = 'tuman_products_ts';
+const KEY_PRODUCTS_CACHE = 'tuman_products_cache_v9';
+const KEY_CART = 'tuman_cart_v6';
+const KEY_FAVORITES = 'tuman_favorites_v6';
+const KEY_THEME = 'tuman_theme_v6';
+const KEY_AGE = 'tuman_age_v6';
+const KEY_MY_CHAT = 'tuman_my_chat_v6';
+const KEY_HALYAVA = 'tuman_halyava_v6';
 
 const PICKUP_POINTS = {
   "Партизанская ст.м": ["16:30","18:00","21:00"],
@@ -417,109 +415,9 @@ const PICKUP_POINTS = {
   "Площадь Ленина": ["19:00","20:30","21:30"]
 };
 const MAX_TIME = "22:40";
-const PRODUCTS_TTL = 5 * 60 * 1000;
 const CATEGORY_NAMES = { liquid:'Жидкость', snus:'Снюс', device:'Под-система', accessory:'Расходник' };
 
-const DEFAULT_PRODUCTS_RAW = [
-  { id:1, name:"Annima Love 50mg — Смородина вишня черника", price:15, desc:"🫐🍒", category:"liquid", categoryName:"Жидкость", icon:"❤️", stock:20, photo:"https://imgur.com/a/tUzvjih" },
-  { id:2, name:"Annima Love 50mg — Черника гранат", price:15, desc:"🫐❤️", category:"liquid", categoryName:"Жидкость", icon:"❤️", stock:20, photo:"" },
-  { id:3, name:"BJORN ZLOY 60mg — Энергетик Виноград", price:15, desc:"⚡️🍇", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
-  { id:4, name:"BJORN ZLOY 60mg — Виноград Вишня", price:15, desc:"🍇🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
-  { id:5, name:"BJORN ZLOY 60mg — Лесные Ягоды", price:15, desc:"🍓🫐", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
-  { id:6, name:"BJORN ZLOY 60mg — Вишня", price:15, desc:"🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
-  { id:7, name:"BJORN ZLOY 60mg — Грейпфрут с Черешней", price:15, desc:"🍊🍒", category:"liquid", categoryName:"Жидкость", icon:"🐻", stock:20, photo:"" },
-  { id:8, name:"Catswill Sour 50mg — Газировка Лимон Груша", price:15, desc:"🥤🍋🍐", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:9, name:"Catswill Sour 50mg — Грейпфрут с Вишней", price:15, desc:"🍊🍒", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:10, name:"Catswill Sour 50mg — Чупа-чупс Грейпфрут Клубника", price:15, desc:"🍭🍓", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:11, name:"Catswill Sour 50mg — Яблоко Маракуйя", price:15, desc:"🍏🥭", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:12, name:"Catswill Sour 50mg — Яблочная Кислинка", price:15, desc:"🍏⚡️", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:13, name:"Catswill Sour 50mg — Яблочная Конфета с Грушей", price:15, desc:"🍬🍏🍐", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:14, name:"Catswill Sour 50mg — Яблочно-Клубничная Шипучка", price:15, desc:"🫧🍏🍓", category:"liquid", categoryName:"Жидкость", icon:"🍋", stock:20, photo:"" },
-  { id:15, name:"DUALL salt 20mg — Киви Гуава", price:15, desc:"🥝🍈", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
-  { id:16, name:"DUALL salt 20mg — Кола Лимон", price:15, desc:"🥤🍋", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
-  { id:17, name:"DUALL salt 20mg — Манго Кумкват", price:15, desc:"🥭🍊", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
-  { id:18, name:"DUALL salt 20mg — Морозная Вишня", price:15, desc:"🧊🍒", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
-  { id:19, name:"DUALL salt 20mg — Холодная Смородина", price:15, desc:"❄️🫐", category:"liquid", categoryName:"Жидкость", icon:"❄️", stock:20, photo:"" },
-  { id:20, name:"Злая Монашка Bubble 70mg — Жвачка с Киви и Малиной", price:15, desc:"🫧🥝🍓", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
-  { id:21, name:"Злая Монашка Bubble 70mg — Мятная Жвачка", price:15, desc:"🌿🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
-  { id:22, name:"Злая Монашка Bubble 70mg — Цитрусовый Бабл-Гам", price:15, desc:"🍊🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
-  { id:23, name:"Злая Монашка Bubble 70mg — Черничный Бабл-Гам", price:15, desc:"🫐🫧", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
-  { id:24, name:"Злая Монашка Bubble 70mg — Чупа-Чупс с Колой", price:15, desc:"🍭🥤", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
-  { id:25, name:"Злая Монашка Bubble 70mg — Смородиновый Холлс", price:15, desc:"❄️🫐", category:"liquid", categoryName:"Жидкость", icon:"😈", stock:20, photo:"" },
-  { id:26, name:"Самоубийца V2 DANGER 100mg — Ананас Малина Банан", price:15, desc:"🍍🍓🍌", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:27, name:"Самоубийца V2 DANGER 100mg — Арбузно-Дынный Фреш", price:15, desc:"🍉🍈", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:28, name:"Самоубийца V2 DANGER 100mg — Виноград Киви Лед", price:15, desc:"🍇🥝🧊", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:29, name:"Самоубийца V2 DANGER 100mg — Виноград Смородина Мята", price:15, desc:"🍇🫐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:30, name:"Самоубийца V2 DANGER 100mg — Вишневый Йогурт", price:15, desc:"🍒🍦", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:31, name:"Самоубийца V2 DANGER 100mg — Вишневый Холлс", price:15, desc:"❄️🍒", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:32, name:"Самоубийца V2 DANGER 100mg — Вишня Виноград", price:15, desc:"🍒🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:33, name:"Самоубийца V2 DANGER 100mg — Вишня Смородина Лед", price:15, desc:"🍒🫐🧊", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:34, name:"Самоубийца V2 DANGER 100mg — Груша Мята", price:15, desc:"🍐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:35, name:"Самоубийца V2 DANGER 100mg — Дыня Апельсин Клубника", price:15, desc:"🍈🍊🍓", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:36, name:"Самоубийца V2 DANGER 100mg — Зеленый Скиттлс", price:15, desc:"🍏🍬", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:37, name:"Самоубийца V2 DANGER 100mg — Земляника Виноград", price:15, desc:"🍓🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:38, name:"Самоубийца V2 DANGER 100mg — Земляника Малина", price:15, desc:"🍓❤️", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:39, name:"Самоубийца V2 DANGER 100mg — Земляничный Спрайт", price:15, desc:"🍓🥤", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:40, name:"Самоубийца V2 DANGER 100mg — Кислое Яблоко с Ежевикой", price:15, desc:"🍏🫐", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:41, name:"Самоубийца V2 DANGER 100mg — Клубника Ежевика Мята", price:15, desc:"🍓🫐🌿", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:42, name:"Самоубийца V2 DANGER 100mg — Кола Лесные Ягоды", price:15, desc:"🥤🫐", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:43, name:"Самоубийца V2 DANGER 100mg — Малина Виноград", price:15, desc:"🍓🍇", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:44, name:"Самоубийца V2 DANGER 100mg — Малиново-Яблочный мохито", price:15, desc:"🍓🍏🍹", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:45, name:"Самоубийца V2 DANGER 100mg — Мультифрукт", price:15, desc:"🍍🥭🍌", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:46, name:"Самоубийца V2 DANGER 100mg — Ягодная Жвачка", price:15, desc:"🍓🫧", category:"liquid", categoryName:"Жидкость", icon:"☠️", stock:20, photo:"" },
-  { id:47, name:"Catswill Classic 50mg — Морозный Апельсин Маракуйя", price:15, desc:"🧊🍊🥭", category:"liquid", categoryName:"Жидкость", icon:"🐱", stock:20, photo:"" },
-  { id:48, name:"Catswill Classic 50mg — Сладкий Апельсин Груша Лед", price:15, desc:"🍊🍐❄️", category:"liquid", categoryName:"Жидкость", icon:"🐱", stock:20, photo:"" },
-  { id:49, name:"PODONKI VINTAGE 50mg — Апельсиновая газировка", price:15, desc:"🍊🥤", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
-  { id:50, name:"PODONKI VINTAGE 50mg — Брусничный морс", price:15, desc:"🍒🥤", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
-  { id:51, name:"PODONKI VINTAGE 50mg — Земляничный мусс", price:15, desc:"🍓🍨", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
-  { id:52, name:"PODONKI VINTAGE 50mg — Пинаколада с грушей", price:15, desc:"🍹🍐", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
-  { id:53, name:"PODONKI VINTAGE 50mg — Яблочный лимонад", price:15, desc:"🍏🍋", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
-  { id:54, name:"PODONKI VINTAGE 50mg — Освежающий лимонад", price:15, desc:"🍋🧊", category:"liquid", categoryName:"Жидкость", icon:"🎩", stock:20, photo:"" },
-  { id:55, name:"Rick And Morty Bad Trip 50mg — Киви личи (х2)", price:15, desc:"🥝🍒", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:56, name:"Rick And Morty Bad Trip 50mg — Киви гуава маракуйя (х2)", price:15, desc:"🥝🍈🥭", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:57, name:"Rick And Morty Bad Trip 50mg — Арбуз Малина", price:15, desc:"🍉🍓", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:58, name:"Rick And Morty Bad Trip 50mg — Банан кокос", price:15, desc:"🍌🥥", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:59, name:"Rick And Morty Bad Trip 50mg — Барбарис энергетик", price:15, desc:"🍬⚡️", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:60, name:"Rick And Morty Bad Trip 50mg — Виноград энергетик", price:15, desc:"🍇⚡️", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:61, name:"Rick And Morty Bad Trip 50mg — Гранат клубника", price:15, desc:"❤️🍓", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:62, name:"Rick And Morty Bad Trip 50mg — Гранат Смородина", price:15, desc:"❤️🫐", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:63, name:"Rick And Morty Bad Trip 50mg — Грейпфрутовый швепс", price:15, desc:"🍊🥤", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:64, name:"Rick And Morty Bad Trip 50mg — Земляника драгонфрут", price:15, desc:"🍓🐉", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:65, name:"Rick And Morty Bad Trip 50mg — Клубника банан", price:15, desc:"🍓🍌", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:66, name:"Rick And Morty Bad Trip 50mg — Клубника вишня", price:15, desc:"🍓🍒", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:67, name:"Rick And Morty Bad Trip 50mg — Клубничный мохито", price:15, desc:"🍓🍹", category:"liquid", categoryName:"Жидкость", icon:"🛸", stock:20, photo:"" },
-  { id:68, name:"Пошлая Рабыня 83mg — Ананасовый сок", price:15, desc:"🍍🧃", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
-  { id:69, name:"Пошлая Рабыня 83mg — Арбуз Дыня", price:15, desc:"🍉🍈", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
-  { id:70, name:"Пошлая Рабыня 83mg — Кока Кола с Ванилью", price:15, desc:"🥤🍦", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
-  { id:71, name:"Пошлая Рабыня 83mg — Passionfruit Манго Маракуйя", price:15, desc:"🥭", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
-  { id:72, name:"Пошлая Рабыня 83mg — Цитрусовый Микс", price:15, desc:"🍋🍊", category:"liquid", categoryName:"Жидкость", icon:"⛓️", stock:20, photo:"" },
-  { id:73, name:"Iceburn Ghetto 150mg — Малина Вишня", price:12, desc:"🍓🍒", category:"snus", categoryName:"Снюс", icon:"🔥", stock:20, photo:"" },
-  { id:74, name:"Iceburn Ghetto 150mg — Персик Малина", price:12, desc:"🍑🍓", category:"snus", categoryName:"Снюс", icon:"🔥", stock:20, photo:"" },
-  { id:75, name:"Iceburn Ghetto 150mg — Энергетик Вишня", price:12, desc:"⚡️🍒", category:"snus", categoryName:"Снюс", icon:"🔥", stock:20, photo:"" },
-  { id:76, name:"Iceburn Monster 75mg — Цитрус", price:12, desc:"🍋🍊", category:"snus", categoryName:"Снюс", icon:"👹", stock:20, photo:"" },
-  { id:77, name:"Никобустер 2%", price:4, desc:"💧", category:"accessory", categoryName:"Никобустер", icon:"🧪", stock:20, photo:"" },
-  { id:78, name:"Xros 6 mini — Black (3 шт)", price:60, desc:"🖤", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:79, name:"Xros 6 mini — Titanium black (3 шт)", price:60, desc:"🩶", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:80, name:"Xros 6 mini — Titanium silver (3 шт)", price:60, desc:"🤍", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:81, name:"Xros 6 mini — Plume white (3 шт)", price:60, desc:"🕊️", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:82, name:"Xros 6 mini — Plume pink (1 шт)", price:60, desc:"🌸", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:83, name:"Xros 6 mini — Plume blue (1 шт)", price:60, desc:"🩵", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:84, name:"Xros 6 mini — Jelly pink (2 шт)", price:60, desc:"🩷", category:"device", categoryName:"Под-система", icon:"📱", stock:5, photo:"" },
-  { id:85, name:"Hero 5 — Crystal Purple", price:95, desc:"💜", category:"device", categoryName:"Под-система", icon:"🛡️", stock:3, photo:"" },
-  { id:86, name:"Hero 5 — Steel silver", price:95, desc:"⚙️", category:"device", categoryName:"Под-система", icon:"🛡️", stock:3, photo:"" },
-  { id:87, name:"Hero 5 — Pure white", price:95, desc:"🤍", category:"device", categoryName:"Под-система", icon:"🛡️", stock:3, photo:"" },
-  { id:88, name:"BRUSKO FEELIN — Черный", price:20, desc:"🖤", category:"device", categoryName:"Под-система", icon:"⚡", stock:10, photo:"" },
-  { id:89, name:"Картридж xros 0.4 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
-  { id:90, name:"Картридж xros 0.6 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
-  { id:91, name:"Картридж xros 0.8 3ml Corex 3.0", price:13, desc:"🔌", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
-  { id:92, name:"Испаритель GeekVape 0.2 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" },
-  { id:93, name:"Испаритель Smoant - 0.3 om", price:13, desc:"🌀", category:"accessory", categoryName:"Расходник", icon:"⚙️", stock:30, photo:"" }
-];
-
-const DEFAULT_PRODUCTS = DEFAULT_PRODUCTS_RAW.map(p => ({ ...p, inStock: p.stock > 0 }));
-
-/* ===== СОСТОЯНИЕ ===== */
-let products = JSON.parse(localStorage.getItem(KEY_PRODUCTS) || 'null') || DEFAULT_PRODUCTS;
+let products = [];
 let cart = JSON.parse(localStorage.getItem(KEY_CART) || '[]');
 let favorites = JSON.parse(localStorage.getItem(KEY_FAVORITES) || '[]');
 let remoteOrders = [];
@@ -530,37 +428,18 @@ let currentDiscountLabel = '';
 let isAdminAuth = false;
 let isSubmitting = false;
 
-/* ===== УТИЛИТЫ ===== */
 function escapeHtml(v) {
   if (v === null || v === undefined) return '';
-  return String(v)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-function escapeMd(s) {
-  return String(s).replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$1');
-}
-function getStock(p) {
-  if (!p) return 0;
-  const s = (p.stock === undefined) ? (p.inStock ? 1 : 0) : p.stock;
-  return Math.max(0, Number(s) || 0);
-}
-function debounce(fn, ms = 300) {
-  let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-}
-function saveProducts() { try { localStorage.setItem(KEY_PRODUCTS, JSON.stringify(products)); } catch(e) { console.log('saveProducts error', e); } }
+function escapeMd(s) { return String(s).replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$1'); }
+function getStock(p) { if (!p) return 0; return Math.max(0, Number(p.stock) || 0); }
+function debounce(fn, ms = 300) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 function saveCart() { localStorage.setItem(KEY_CART, JSON.stringify(cart)); }
 function saveFavorites() { localStorage.setItem(KEY_FAVORITES, JSON.stringify(favorites)); }
 function sheetsUrl() { return localStorage.getItem('tuman_sheets_url') || SHEETS_URL_HARDCODED; }
 function tgToken() { return localStorage.getItem('tuman_tg_token') || TG_TOKEN_HARDCODED; }
-function tgAdminChats() {
-  const s = localStorage.getItem('tuman_tg_chats') || TG_CHATS_HARDCODED;
-  return s.split(',').map(x => x.trim()).filter(Boolean);
-}
+function tgAdminChats() { const s = localStorage.getItem('tuman_tg_chats') || TG_CHATS_HARDCODED; return s.split(',').map(x=>x.trim()).filter(Boolean); }
 function isWeekend() { const d = new Date().getDay(); return d === 0 || d === 6; }
 function halyavaCount() { return Number(localStorage.getItem(KEY_HALYAVA) || '0'); }
 
@@ -571,87 +450,71 @@ function toast(msg, type) {
   t.style.borderColor = type === 'error' ? '#ff4d4d' : (type === 'success' ? '#4ade80' : 'var(--purple)');
   t.textContent = msg;
   c.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => t.remove(), 3500);
 }
 
-async function tgSend(chat, text, retries = 2) {
-  for (let i = 0; i <= retries; i++) {
-    try {
-      const r = await fetch(`https://api.telegram.org/bot${tgToken()}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown' })
-      });
-      const j = await r.json();
-      if (j.ok) return j;
-      if (j.error_code === 429) {
-        await new Promise(r => setTimeout(r, (j.parameters?.retry_after || 1) * 1000));
-        continue;
-      }
-      if (j.error_code === 400) { console.error('TG 400:', j.description); return j; }
-    } catch (e) {
-      if (i === retries) return { ok: false, error: String(e) };
-      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-    }
-  }
-  return { ok: false, error: 'max retries' };
+async function tgSend(chat, text) {
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${tgToken()}/sendMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chat, text, parse_mode: 'Markdown' })
+    });
+    return await r.json();
+  } catch (e) { return { ok: false, error: String(e) }; }
 }
 
-/* ===== СИНХРОНИЗАЦИЯ С СЕРВЕРОМ ===== */
-async function loadProductsFromServer(force = false) {
-  const ts = Number(localStorage.getItem(KEY_PRODUCTS_TS) || '0');
-  if (!force && Date.now() - ts < PRODUCTS_TTL) return true;
+async function loadProductsFromServer(silent = false) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 12000);
+  const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
     const res = await fetch(sheetsUrl() + '?action=products&t=' + Date.now(), { signal: ctrl.signal });
     const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
+    if (Array.isArray(data) && data.length) {
       products = data.map(p => ({ ...p, inStock: Number(p.stock) > 0 }));
-      saveProducts();
-      localStorage.setItem(KEY_PRODUCTS_TS, String(Date.now()));
+      localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
       return true;
     }
+    if (!silent) toast('В таблице нет товаров', 'error');
     return false;
   } catch (e) {
-    console.log('products load error', e);
+    console.log('load products error', e);
+    const cache = localStorage.getItem(KEY_PRODUCTS_CACHE);
+    if (cache) { try { products = JSON.parse(cache); return true; } catch(_){} }
+    if (!silent) toast('Не удалось загрузить товары', 'error');
     return false;
   } finally { clearTimeout(timer); }
 }
 
+async function loadOrdersFromServer() {
+  try {
+    const res = await fetch(sheetsUrl() + '?action=orders&t=' + Date.now());
+    const data = await res.json();
+    if (Array.isArray(data)) { remoteOrders = data; return true; }
+    return false;
+  } catch (e) { console.log('load orders error', e); return false; }
+}
+
 async function saveProductToServer(product) {
   try {
-    await fetch(sheetsUrl(), {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'saveProduct', product })
-    });
+    await fetch(sheetsUrl(), { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'saveProduct', product }) });
     return true;
-  } catch (e) { console.log('save product error', e); return false; }
+  } catch (e) { console.log(e); return false; }
 }
-
 async function deleteProductFromServer(id) {
   try {
-    await fetch(sheetsUrl(), {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'deleteProduct', id })
-    });
+    await fetch(sheetsUrl(), { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'deleteProduct', id }) });
     return true;
-  } catch (e) { console.log('delete product error', e); return false; }
+  } catch (e) { console.log(e); return false; }
 }
-
 async function submitStockChanges(changes) {
   try {
-    await fetch(sheetsUrl(), {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'stockChanges', changes })
-    });
-  } catch (e) { console.log('stock changes error', e); }
+    await fetch(sheetsUrl(), { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'stockChanges', changes }) });
+  } catch (e) { console.log(e); }
 }
 
-/* ===== ИНИЦИАЛИЗАЦИЯ ===== */
 async function init() {
   if (localStorage.getItem(KEY_THEME) === 'light') {
     document.body.classList.add('light-theme');
@@ -661,11 +524,10 @@ async function init() {
     document.getElementById('age-gate').classList.add('hidden');
     document.body.classList.remove('locked');
   }
-  renderProducts();
-  renderCart();
   attachEvents();
   await loadProductsFromServer();
   renderProducts();
+  renderCart();
 }
 
 function attachEvents() {
@@ -697,11 +559,7 @@ function attachEvents() {
     document.getElementById('backdrop').classList.remove('open');
   };
   document.getElementById('clear-cart').onclick = () => {
-    if (confirm('Очистить?')) {
-      cart = []; currentDiscount = 0; currentDiscountLabel = '';
-      saveCart(); renderCart();
-      document.getElementById('discount-row').style.display = 'none';
-    }
+    if (confirm('Очистить?')) { cart=[]; currentDiscount=0; currentDiscountLabel=''; saveCart(); renderCart(); document.getElementById('discount-row').style.display='none'; }
   };
   document.getElementById('open-checkout').onclick = () => {
     if (!cart.length) return toast('Корзина пуста', 'error');
@@ -713,12 +571,13 @@ function attachEvents() {
     document.getElementById('checkout-modal').classList.remove('open');
     document.getElementById('backdrop').classList.remove('open');
   };
+  document.getElementById('check-bot-btn').onclick = checkBot;
   document.getElementById('open-my-orders').onclick = async () => {
     const list = document.getElementById('my-orders-list');
     list.innerHTML = '<p style="color:var(--muted);text-align:center;">Загрузка...</p>';
     document.getElementById('my-orders-modal').classList.add('open');
     document.getElementById('backdrop').classList.add('open');
-    await loadRemoteOrders();
+    await loadOrdersFromServer();
     renderMyOrders();
   };
   document.getElementById('close-my-orders').onclick = () => {
@@ -730,11 +589,11 @@ function attachEvents() {
     const sel = document.getElementById('order-time-select');
     const wrap = document.getElementById('order-time-custom-wrap');
     sel.innerHTML = '<option value="">Выберите...</option>';
-    if (!p) { sel.innerHTML = '<option value="">Сначала точку...</option>'; wrap.style.display = 'none'; return; }
-    if (isWeekend()) { sel.style.display = 'none'; wrap.style.display = 'block'; }
+    if (!p) { sel.innerHTML = '<option value="">Сначала точку...</option>'; wrap.style.display='none'; return; }
+    if (isWeekend()) { sel.style.display='none'; wrap.style.display='block'; }
     else {
-      sel.style.display = 'block'; wrap.style.display = 'none';
-      (PICKUP_POINTS[p] || []).forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o); });
+      sel.style.display='block'; wrap.style.display='none';
+      (PICKUP_POINTS[p] || []).forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o); });
     }
   };
   document.getElementById('apply-promo').onclick = () => {
@@ -744,22 +603,19 @@ function attachEvents() {
     const d = document.getElementById('discount-row');
     const pct = document.getElementById('discount-percent');
     if (code.toLowerCase() === 'kura-10') {
-      currentDiscount = 10; currentDiscountLabel = 'kura-10';
-      s.textContent = '✅ kura-10: скидка 10%'; s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
-      pct.textContent = '10';
+      currentDiscount=10; currentDiscountLabel='kura-10';
+      s.textContent='✅ kura-10: скидка 10%'; s.style.display='block'; e.style.display='none'; d.style.display='flex'; pct.textContent='10';
     } else if (code.toUpperCase() === 'ХАЛЯВА') {
       if (halyavaCount() >= 5) {
-        currentDiscount = 0; currentDiscountLabel = '';
-        s.style.display = 'none'; e.style.display = 'block'; d.style.display = 'none';
-        e.textContent = '❌ ХАЛЯВА исчерпана (5/5)'; return;
+        currentDiscount=0; currentDiscountLabel='';
+        s.style.display='none'; e.style.display='block'; d.style.display='none';
+        e.textContent='❌ ХАЛЯВА исчерпана (5/5)'; return;
       }
-      currentDiscount = 5; currentDiscountLabel = 'ХАЛЯВА';
-      s.textContent = '✅ ХАЛЯВА: скидка 5%'; s.style.display = 'block'; e.style.display = 'none'; d.style.display = 'flex';
-      pct.textContent = '5';
+      currentDiscount=5; currentDiscountLabel='ХАЛЯВА';
+      s.textContent='✅ ХАЛЯВА: скидка 5%'; s.style.display='block'; e.style.display='none'; d.style.display='flex'; pct.textContent='5';
     } else {
-      currentDiscount = 0; currentDiscountLabel = '';
-      s.style.display = 'none'; e.style.display = 'block'; d.style.display = 'none';
-      e.textContent = '❌ Неверный код';
+      currentDiscount=0; currentDiscountLabel='';
+      s.style.display='none'; e.style.display='block'; d.style.display='none'; e.textContent='❌ Неверный код';
     }
     updateCheckoutTotal();
   };
@@ -779,51 +635,74 @@ function attachEvents() {
     toast(showOnlyFavorites ? 'Избранное' : 'Все товары');
     renderProducts();
   };
-  document.getElementById('secret-btn').onclick = () => {
+  document.getElementById('secret-btn').onclick = async () => {
     if (!isAdminAuth) {
       const pass = prompt('Пароль:');
       if (pass === ADMIN_PASSWORD) isAdminAuth = true;
       else return toast('Неверный пароль', 'error');
     }
     document.getElementById('admin-modal').classList.add('open');
-    renderAdminTable();
-    renderAdminOrders();
     document.getElementById('set-tg-token').value = tgToken();
     document.getElementById('set-tg-chat').value = tgAdminChats().join(',');
     document.getElementById('set-sheets-url').value = sheetsUrl();
+    await loadProductsFromServer(true);
+    renderAdminTable();
+    renderAdminOrders();
   };
   document.getElementById('close-admin').onclick = () => document.getElementById('admin-modal').classList.remove('open');
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-      document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display='none');
+      document.getElementById('tab-'+btn.dataset.tab).style.display='block';
       if (btn.dataset.tab === 'orders') renderAdminOrders();
       if (btn.dataset.tab === 'products') renderAdminTable();
     };
   });
   document.getElementById('admin-search-orders').oninput = debounce(renderAdminOrders, 350);
   document.getElementById('admin-filter-orders').onchange = renderAdminOrders;
-  document.getElementById('refresh-orders').onclick = () => renderAdminOrders(true);
+  document.getElementById('refresh-orders').onclick = renderAdminOrders;
   document.getElementById('add-product-btn').onclick = addNewProduct;
   document.getElementById('reload-products').onclick = async () => {
     await loadProductsFromServer(true);
-    renderAdminTable();
-    renderProducts();
+    renderAdminTable(); renderProducts();
     toast('Товары обновлены', 'success');
   };
   document.getElementById('save-settings').onclick = () => {
     localStorage.setItem('tuman_tg_token', document.getElementById('set-tg-token').value.trim());
     localStorage.setItem('tuman_tg_chats', document.getElementById('set-tg-chat').value.trim());
     localStorage.setItem('tuman_sheets_url', document.getElementById('set-sheets-url').value.trim());
-    toast('Настройки сохранены', 'success');
+    toast('Настройки сохранены. Обновите страницу.', 'success');
   };
 }
 
-/* ===== РЕНДЕР ТОВАРОВ ===== */
+async function checkBot() {
+  const result = document.getElementById('check-bot-result');
+  const id = document.getElementById('order-tg').value.trim();
+  if (!id) { result.textContent = '⚠️ Введите Telegram ID'; result.style.color = '#ffb020'; return; }
+  if (!/^\d+$/.test(id)) { result.textContent = '⚠️ Только цифры'; result.style.color = '#ffb020'; return; }
+  result.textContent = 'Проверяем...'; result.style.color = 'var(--muted)';
+  const res = await tgSend(id, '✅ Бот подключён! Теперь вы будете получать уведомления о заказах от «Туманный уголок».');
+  if (res && res.ok) {
+    result.textContent = '✅ Проверьте Telegram — сообщение пришло';
+    result.style.color = '#4ade80';
+  } else if (res && res.error_code === 403) {
+    result.textContent = '❌ Откройте @Tuman_corner_bot и нажмите Start';
+    result.style.color = '#ff4d4d';
+  } else {
+    result.textContent = '❌ Ошибка. Откройте @Tuman_corner_bot и нажмите Start.';
+    result.style.color = '#ff4d4d';
+  }
+  setTimeout(() => { result.textContent=''; }, 10000);
+}
+
 function renderProducts() {
   const grid = document.getElementById('product-grid');
+  if (!products.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Загрузка товаров...</div>';
+    return;
+  }
   const q = document.getElementById('search').value.toLowerCase().trim();
   const sort = document.getElementById('sort').value;
   let list = products.filter(p => {
@@ -839,9 +718,7 @@ function renderProducts() {
   grid.innerHTML = list.map(p => {
     const fav = favorites.includes(p.id);
     const safePhoto = (typeof p.photo === 'string' && /^(https?:|data:image\/)/.test(p.photo)) ? p.photo : '';
-    const art = safePhoto
-      ? `<img src="${escapeHtml(safePhoto)}" alt="${escapeHtml(p.name)}" loading="lazy">`
-      : `<div class="product-icon">${escapeHtml(p.icon)}</div>`;
+    const art = safePhoto ? `<img src="${escapeHtml(safePhoto)}" alt="${escapeHtml(p.name)}" loading="lazy">` : `<div class="product-icon">${escapeHtml(p.icon || '📦')}</div>`;
     const stock = getStock(p);
     const out = stock <= 0;
     const stockLine = out ? 'Нет в наличии' : `Осталось: ${stock} шт.`;
@@ -849,7 +726,7 @@ function renderProducts() {
     return `<article class="product-card ${out ? 'out-of-stock' : ''}">
       <span class="product-tag">${escapeHtml(p.categoryName)}</span>
       ${out ? '<span class="out-of-stock-badge">Нет в наличии</span>' : ''}
-      <button class="favorite-btn ${fav ? 'active' : ''}" onclick="toggleFav(${Number(p.id)})" aria-pressed="${fav}" aria-label="В избранное">${fav ? '❤️' : '🤍'}</button>
+      <button class="favorite-btn ${fav ? 'active' : ''}" onclick="toggleFav(${Number(p.id)})" aria-pressed="${fav}">${fav ? '❤️' : '🤍'}</button>
       <div class="product-art">${art}</div>
       <div class="product-body">
         <h3>${escapeHtml(p.name)}</h3>
@@ -864,7 +741,6 @@ function renderProducts() {
   }).join('');
 }
 
-/* ===== КОРЗИНА ===== */
 function renderCart() {
   const list = document.getElementById('cart-list');
   let total = 0, count = 0;
@@ -885,7 +761,7 @@ function renderCart() {
           <div class="cart-item-price">${escapeHtml(p.price)} руб./шт</div>
         </div>
         <div class="cart-item-total">${(p.price * item.qty).toFixed(2)} руб.</div>
-        <button class="remove-btn" onclick="removeFromCart(${Number(p.id)})" aria-label="Удалить">✕</button>
+        <button class="remove-btn" onclick="removeFromCart(${Number(p.id)})">✕</button>
       </li>`;
     }).join('');
   }
@@ -895,8 +771,7 @@ function renderCart() {
 }
 
 function addToCart(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
+  const p = products.find(x => x.id === id); if (!p) return;
   const stock = getStock(p);
   if (stock <= 0) return toast('Нет в наличии', 'error');
   const item = cart.find(x => x.id === id);
@@ -906,8 +781,7 @@ function addToCart(id) {
   renderCart(); toast(`"${p.name}" добавлен`);
 }
 function changeQty(id, d) {
-  const item = cart.find(x => x.id === id);
-  if (!item) return;
+  const item = cart.find(x => x.id === id); if (!item) return;
   const p = products.find(x => x.id === id);
   const stock = p ? getStock(p) : 0;
   if (d > 0 && item.qty + d > stock) return toast(`В наличии только ${stock} шт.`, 'error');
@@ -930,7 +804,6 @@ function updateCheckoutTotal() {
   document.getElementById('final-total').textContent = `${(total - disc).toFixed(2)} руб.`;
 }
 
-/* ===== ОФОРМЛЕНИЕ ЗАКАЗА ===== */
 async function submitOrder() {
   if (isSubmitting) return;
   const name = document.getElementById('order-name');
@@ -947,13 +820,12 @@ async function submitOrder() {
   if (!timeValue) return toast('Выбери время', 'error');
   if (timeValue > MAX_TIME) return toast('Последнее время — 22:40', 'error');
   if (!isWeekend() && !(PICKUP_POINTS[point.value] || []).includes(timeValue)) return toast('Выбери время из списка', 'error');
-  if (buyerChat && !/^\d+$/.test(buyerChat)) return toast('Telegram ID — только цифры (узнать у @userinfobot)', 'error');
+  if (buyerChat && !/^\d+$/.test(buyerChat)) return toast('Telegram ID — только цифры', 'error');
 
   for (const item of cart) {
     const p = products.find(x => x.id === item.id);
     if (!p) continue;
-    const stock = getStock(p);
-    if (item.qty > stock) return toast(`"${p.name}" — в наличии только ${stock} шт.`, 'error');
+    if (item.qty > getStock(p)) return toast(`"${p.name}" — в наличии только ${getStock(p)} шт.`, 'error');
   }
 
   isSubmitting = true;
@@ -969,97 +841,76 @@ async function submitOrder() {
     });
     const discAmt = total * currentDiscount / 100;
 
-    const changes = cart.map(i => ({ id: i.id, delta: -i.qty }));
-    cart.forEach(i => {
-      const p = products.find(x => x.id === i.id);
-      if (p) { p.stock = Math.max(0, getStock(p) - i.qty); p.inStock = p.stock > 0; }
-    });
-    saveProducts();
-    await submitStockChanges(changes);
-
     const order = {
-      id: Date.now(),
       date: new Date().toLocaleString('ru-RU'),
       name: name.value.trim(),
       branch: 'Пункт выдачи',
       metro: point.value,
       time: timeValue,
-      items,
+      items: items.map(i => `${i.name} x${i.qty}`).join('; '),
       discount: currentDiscount,
-      discountLabel: currentDiscountLabel,
       total: (total - discAmt).toFixed(2),
-      status: 'pending',
       buyerChat
     };
 
     try {
-      await fetch(sheetsUrl(), {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          date: order.date,
-          name: order.name,
-          branch: order.branch,
-          metro: order.metro,
-          time: order.time,
-          items: order.items.map(i => `${i.name} x${i.qty}`).join('; '),
-          discount: order.discount,
-          total: order.total,
-          status: 'pending',
-          buyerChat: order.buyerChat
-        })
-      });
-    } catch (e) { console.log('Sheets post error', e); }
+      await fetch(sheetsUrl(), { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'order', ...order }) });
+    } catch (e) { console.log('order post error', e); }
 
-    let adminText = `🔞 *Новый Заказик!🔞*\n\n👤 Клиент: ${escapeMd(order.name)}\n📍 Точка: ${escapeMd(order.metro)}\n⏰ Время: ${escapeMd(order.time)}\n\n🛒 *Заказ:*\n`;
-    order.items.forEach(i => { adminText += `• ${escapeMd(i.name)} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
-    if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}% (${escapeMd(order.discountLabel)})`;
+    const changes = cart.map(i => ({ id: i.id, delta: -i.qty }));
+    await submitStockChanges(changes);
+
+    cart.forEach(i => {
+      const p = products.find(x => x.id === i.id);
+      if (p) { p.stock = Math.max(0, getStock(p) - i.qty); p.inStock = p.stock > 0; }
+    });
+    localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+
+    let adminText = `🔞 *Новый Заказ!*\n\n👤 Клиент: ${escapeMd(order.name)}\n📍 Точка: ${escapeMd(order.metro)}\n⏰ Время: ${escapeMd(order.time)}\n\n🛒 *Заказ:*\n`;
+    items.forEach(i => { adminText += `• ${escapeMd(i.name)} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
+    if (order.discount > 0) adminText += `\n🎁 Скидка ${order.discount}%`;
     adminText += `\n💰 *Итого: ${order.total} руб.*`;
     await Promise.allSettled(tgAdminChats().map(chat => tgSend(chat, adminText)));
 
     if (buyerChat) {
       if (!localStorage.getItem(KEY_MY_CHAT)) localStorage.setItem(KEY_MY_CHAT, buyerChat);
       let buyerText = `✅ *Заказ принят!*\n\n📍 Точка: ${escapeMd(order.metro)}\n⏰ Время: ${escapeMd(order.time)}\n\n🛒 *Состав:*\n`;
-      order.items.forEach(i => { buyerText += `• ${escapeMd(i.name)} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
-      if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}% (${escapeMd(order.discountLabel)})`;
-      buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения, по вопросам @nekati_n`;
-      const res = await tgSend(buyerChat, buyerText);
-      if (!res.ok) toast('Покупателю не отправлено. Пусть нажмёт Start у бота.', 'error');
+      items.forEach(i => { buyerText += `• ${escapeMd(i.name)} × ${i.qty} = ${i.price*i.qty} руб.\n`; });
+      if (order.discount > 0) buyerText += `\n🎁 Скидка ${order.discount}%`;
+      buyerText += `\n💰 *Итого: ${order.total} руб.*\n\nМы свяжемся для подтверждения.`;
+      await tgSend(buyerChat, buyerText);
     }
 
-    if (currentDiscountLabel === 'ХАЛЯВА') {
-      localStorage.setItem(KEY_HALYAVA, String(halyavaCount() + 1));
-    }
+    if (currentDiscountLabel === 'ХАЛЯВА') localStorage.setItem(KEY_HALYAVA, String(halyavaCount()+1));
 
     cart = []; currentDiscount = 0; currentDiscountLabel = '';
     renderCart(); renderProducts();
     document.getElementById('checkout-modal').classList.remove('open');
     document.getElementById('backdrop').classList.remove('open');
     toast('✅ Заявка отправлена!', 'success');
-    name.value = ''; tg.value = ''; point.value = ''; timeSel.value = ''; timeCustom.value = '';
-    document.getElementById('order-promo').value = '';
-    document.getElementById('promo-success').style.display = 'none';
-    document.getElementById('promo-error').style.display = 'none';
-    document.getElementById('discount-row').style.display = 'none';
-    document.getElementById('order-time-custom-wrap').style.display = 'none';
-  } finally {
-    isSubmitting = false;
-    btn.disabled = false;
-  }
+    name.value=''; tg.value=''; point.value=''; timeSel.value=''; timeCustom.value='';
+    document.getElementById('order-promo').value='';
+    document.getElementById('promo-success').style.display='none';
+    document.getElementById('promo-error').style.display='none';
+    document.getElementById('discount-row').style.display='none';
+    document.getElementById('order-time-custom-wrap').style.display='none';
+
+    setTimeout(() => loadProductsFromServer(true).then(renderProducts), 2000);
+  } finally { isSubmitting = false; btn.disabled = false; }
 }
 
-/* ===== МОИ ЗАЯВКИ ===== */
 function renderMyOrders() {
   const list = document.getElementById('my-orders-list');
   const myChat = localStorage.getItem(KEY_MY_CHAT) || '';
   let my = remoteOrders;
   if (myChat) my = my.filter(o => String(o['TelegramID'] || '').trim() === myChat);
-  my = my.slice(-10).reverse();
+  my = my.slice(-15).reverse();
   if (!my.length) { list.innerHTML = '<p style="color:var(--muted);text-align:center;">Заказов нет</p>'; return; }
   list.innerHTML = my.map(o => {
     const st = o['Статус'] || 'pending';
     const cls = st === 'approved' ? 'approved' : st === 'rejected' ? 'rejected' : '';
-    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[st] || escapeHtml(st);
+    const txt = { pending:'⏳ Ожидает', approved:'✅ Одобрено', rejected:'❌ Отклонено' }[st] || escapeHtml(st);
     return `<div class="my-order-card ${cls}">
       <h4 style="margin:0 0 5px;">${escapeHtml(o['Дата'])}</h4>
       <p style="margin:0 0 5px;font-size:13px;color:var(--muted);">Точка: ${escapeHtml(o['Станция'])} · Время: ${escapeHtml(o['Время'])}</p>
@@ -1070,23 +921,11 @@ function renderMyOrders() {
   }).join('');
 }
 
-async function loadRemoteOrders() {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 12000);
-  try {
-    const res = await fetch(sheetsUrl() + '?t=' + Date.now(), { signal: ctrl.signal });
-    remoteOrders = await res.json();
-    return true;
-  } catch (e) {
-    console.log('load error', e); remoteOrders = []; return false;
-  } finally { clearTimeout(timer); }
-}
-
-async function renderAdminOrders(force = false) {
+async function renderAdminOrders() {
   const list = document.getElementById('orders-list');
   list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Загрузка...</div>';
-  const ok = await loadRemoteOrders();
-  if (!ok) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ff4d4d;">Не удалось загрузить.</div>'; return; }
+  const ok = await loadOrdersFromServer();
+  if (!ok) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ff4d4d;">Не удалось загрузить заказы</div>'; return; }
   const q = document.getElementById('admin-search-orders').value.toLowerCase().trim();
   const f = document.getElementById('admin-filter-orders').value;
   let items = remoteOrders.map(r => ({ ...r, _status: r['Статус'] || 'pending' }));
@@ -1095,7 +934,7 @@ async function renderAdminOrders(force = false) {
   if (!items.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Заявок нет</div>'; return; }
   list.innerHTML = items.slice().reverse().map(o => {
     const cls = o._status === 'approved' ? 'approved' : o._status === 'rejected' ? 'rejected' : '';
-    const txt = { pending: '⏳ Ожидает', approved: '✅ Одобрено', rejected: '❌ Отклонено' }[o._status] || escapeHtml(o._status);
+    const txt = { pending:'⏳ Ожидает', approved:'✅ Одобрено', rejected:'❌ Отклонено' }[o._status] || escapeHtml(o._status);
     const row = Number(o._row);
     const btn = (o._status === 'pending' && Number.isFinite(row)) ? `
       <button class="order-btn btn-approve" onclick="changeStatus(${row},'approved')">✅ Одобрить</button>
@@ -1121,11 +960,8 @@ async function renderAdminOrders(force = false) {
 
 async function changeStatus(row, status) {
   try {
-    await fetch(sheetsUrl(), {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'status', row: row, status: status })
-    });
+    await fetch(sheetsUrl(), { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'status', row, status }) });
     toast(status === 'approved' ? 'Заказ одобрен' : 'Заказ отклонён', 'success');
   } catch (e) { console.log(e); }
 
@@ -1135,10 +971,7 @@ async function changeStatus(row, status) {
       const changes = [];
       String(o['Товары']).split('; ').forEach(part => {
         const m = part.match(/^(.+) x(\d+)$/);
-        if (m) {
-          const p = products.find(x => x.name === m[1].trim());
-          if (p) changes.push({ id: p.id, delta: Number(m[2]) });
-        }
+        if (m) { const p = products.find(x => x.name === m[1].trim()); if (p) changes.push({ id: p.id, delta: Number(m[2]) }); }
       });
       if (changes.length) await submitStockChanges(changes);
     }
@@ -1149,23 +982,19 @@ async function changeStatus(row, status) {
     const chat = String(o['TelegramID']).trim();
     if (/^\d+$/.test(chat)) {
       let text;
-      if (status === 'approved') {
-        text = `✅ *Ваш заказ подтверждён!*\n\n📍 Точка: ${escapeMd(o['Станция'] || '')}\n⏰ Время: ${escapeMd(o['Время'] || '')}\n\n💰 Итого: ${escapeMd(o['Итого'] || '')} руб.\n\nЖдём вас!`;
-      } else {
-        text = `❌ *Ваш заказ отклонён.*\n\n📍 Точка: ${escapeMd(o['Станция'] || '')}\n⏰ Время: ${escapeMd(o['Время'] || '')}\n\nСвяжитесь с нами для уточнения.`;
-      }
+      if (status === 'approved') text = `✅ *Ваш заказ подтверждён!*\n\n📍 Точка: ${escapeMd(o['Станция']||'')}\n⏰ Время: ${escapeMd(o['Время']||'')}\n\n💰 Итого: ${escapeMd(o['Итого']||'')} руб.\n\nЖдём вас!`;
+      else text = `❌ *Ваш заказ отклонён.*\n\n📍 Точка: ${escapeMd(o['Станция']||'')}\n⏰ Время: ${escapeMd(o['Время']||'')}\n\nСвяжитесь с нами для уточнения.`;
       await tgSend(chat, text);
     }
   }
-  setTimeout(() => renderAdminOrders(), 1500);
+  setTimeout(renderAdminOrders, 1500);
 }
 
-/* ===== АДМИН: ТОВАРЫ ===== */
 function renderAdminTable() {
   const tbody = document.querySelector('#admin-table tbody');
   tbody.innerHTML = products.map(p => {
     const safePhoto = (typeof p.photo === 'string' && /^(https?:|data:image\/)/.test(p.photo)) ? p.photo : '';
-    const thumb = safePhoto ? `<img src="${escapeHtml(safePhoto)}" class="thumb" alt="">` : `<div class="thumb-empty">${escapeHtml(p.icon)}</div>`;
+    const thumb = safePhoto ? `<img src="${escapeHtml(safePhoto)}" class="thumb">` : `<div class="thumb-empty">${escapeHtml(p.icon||'📦')}</div>`;
     const stock = getStock(p);
     const id = Number(p.id);
     return `<tr>
@@ -1175,7 +1004,7 @@ function renderAdminTable() {
         <input type="file" id="photo-${id}" accept="image/*" onchange="setProductPhoto(${id},this)">
         ${safePhoto ? `<button class="clear-photo" onclick="clearProductPhoto(${id})">✕</button>` : ''}
       </div></td>
-      <td><input type="text" value="${escapeHtml(p.icon)}" onchange="editProd(${id},'icon',this.value)" style="text-align:center;"></td>
+      <td><input type="text" value="${escapeHtml(p.icon||'📦')}" onchange="editProd(${id},'icon',this.value)" style="text-align:center;"></td>
       <td><input type="text" value="${escapeHtml(p.name)}" onchange="editProd(${id},'name',this.value)"></td>
       <td><input type="number" value="${escapeHtml(p.price)}" onchange="editProd(${id},'price',this.value)"></td>
       <td><input type="number" value="${stock}" min="0" onchange="editProd(${id},'stock',this.value)"></td>
@@ -1190,8 +1019,8 @@ function renderAdminTable() {
   }).join('');
 }
 
-function compressImage(file, maxSize = 800, quality = 0.8) {
-  return new Promise((resolve) => {
+function compressImage(file, maxSize=800, quality=0.8) {
+  return new Promise(resolve => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -1200,8 +1029,8 @@ function compressImage(file, maxSize = 800, quality = 0.8) {
         let w = img.width, h = img.height;
         if (w > maxSize) { h = h * maxSize / w; w = maxSize; }
         if (h > maxSize) { w = w * maxSize / h; h = maxSize; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
         resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.src = e.target.result;
@@ -1215,14 +1044,18 @@ async function setProductPhoto(id, input) {
   try {
     const dataUrl = await compressImage(file);
     const p = products.find(x => x.id === id); if (!p) return;
-    p.photo = dataUrl; saveProducts(); renderAdminTable(); renderProducts();
+    p.photo = dataUrl;
+    localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+    renderAdminTable(); renderProducts();
     await saveProductToServer(p);
     toast('Фото обновлено');
-  } catch (e) { console.log(e); toast('Ошибка фото', 'error'); }
+  } catch (e) { toast('Ошибка фото', 'error'); }
 }
 function clearProductPhoto(id) {
   const p = products.find(x => x.id === id); if (!p) return;
-  p.photo = ''; saveProducts(); renderAdminTable(); renderProducts();
+  p.photo = '';
+  localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+  renderAdminTable(); renderProducts();
   saveProductToServer(p);
   toast('Фото удалено');
 }
@@ -1237,32 +1070,34 @@ async function addNewProduct() {
   if (!name) return toast('Введи название', 'error');
   if (isNaN(price) || price <= 0) return toast('Введи цену', 'error');
   if (isNaN(stock) || stock < 0) return toast('Введи количество', 'error');
-  const id = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
+  const id = products.length ? Math.max(...products.map(p => Number(p.id))) + 1 : 1;
   let photo = '';
-  if (file) { try { photo = await compressImage(file); } catch(e) { console.log(e); } }
-  const product = { id, name, price, desc, category, categoryName: CATEGORY_NAMES[category], icon, stock, inStock: stock > 0, photo };
+  if (file) { try { photo = await compressImage(file); } catch(e){} }
+  const product = { id, name, price, desc, category, categoryName: CATEGORY_NAMES[category], icon, stock, inStock: stock>0, photo };
   products.push(product);
-  saveProducts(); renderAdminTable(); renderProducts();
+  localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+  renderAdminTable(); renderProducts();
   await saveProductToServer(product);
   toast('Товар добавлен');
   document.getElementById('np-name').value=''; document.getElementById('np-price').value='';
   document.getElementById('np-desc').value=''; document.getElementById('np-photo').value='';
-  document.getElementById('np-stock-count').value = '10';
+  document.getElementById('np-stock-count').value='10';
 }
 async function editProd(id, field, val) {
   const p = products.find(x => x.id === id); if (!p) return;
   if (field === 'price') p.price = Number(val);
   else if (field === 'stock') { p.stock = Math.max(0, parseInt(val, 10) || 0); p.inStock = p.stock > 0; }
-  else if (field === 'inStock') p.inStock = val;
   else p[field] = val;
   if (field === 'category') p.categoryName = CATEGORY_NAMES[val];
-  saveProducts(); renderProducts();
+  localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+  renderProducts();
   await saveProductToServer(p);
 }
 async function deleteProd(id) {
   if (!confirm('Удалить?')) return;
   products = products.filter(x => x.id !== id);
-  saveProducts(); renderAdminTable(); renderProducts();
+  localStorage.setItem(KEY_PRODUCTS_CACHE, JSON.stringify(products));
+  renderAdminTable(); renderProducts();
   await deleteProductFromServer(id);
 }
 
